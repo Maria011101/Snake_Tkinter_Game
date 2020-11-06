@@ -43,13 +43,13 @@ def match(word1):
     if choice3 in ["YES","yes", "y","Y","YEAH","yeah"]:
         correct_words += 1
         words_changed += 1
-        print("\n Okay1 Word updated!")
+        print("\n Okay! Word updated!")
         return best_word
     else:
         wrong_words += 1
         print("\n Okay! Word was not updated!")
         return word1
-#
+
 def spell_check_sentence(wordList1):
     global wrong_words
     global correct_words
@@ -97,7 +97,7 @@ def spell_check_sentence(wordList1):
                     word = match(word)
 
                 else:
-                    print("\nInvalid input! Please write a valid input: 1, 2, 3 or 4. It's not hard.\n")
+                    print("\nInvalid input! Please write a valid input: 1, 2, 3 or 4.\n")
                     i = 0
         wordList_modified.append(word)
 
@@ -148,7 +148,7 @@ def spell_check_file(fileList1):
                     file_word = match(file_word)
 
                 else:
-                    print("\nInvalid input! Please write a valid input: 1, 2, 3 or 4. It's not hard.\n")
+                    print("\nInvalid input! Please write a valid input: 1, 2, 3 or 4.\n")
                     i = 0
         fileList_modified.append(file_word)
 
@@ -161,13 +161,13 @@ def createFile(the_list):
     newFile=open(newFile_name,"a")
 
     newFile.write("\nOK! Time for statistics:\n")
-    newFile.write("In total, you wrote " + str(total_words) + " words. \n")
-    newFile.write("You spelled corectly " + str(correct_words) + " words. \n")
-    newFile.write("You spelled incorectly " + str(wrong_words) + " words. \n")
-    newFile.write("You changed " + str(words_changed) + " words with my suggestions. \n")
-    newFile.write("You added " + str(added_words) + " words to the dictionary \n")
-    newFile.write("The date and time that the program executed: " + str(datetime.now()) + "\n")
-    newFile.write("The amount of time elapsed to spellcheck the input: " + str(end-start))
+    newFile.write("     ✓ In total, you wrote " + str(total_words) + " words. \n")
+    newFile.write("     ✓ You spelled corectly " + str(correct_words) + " words. \n")
+    newFile.write("     ✓ You spelled incorectly " + str(wrong_words) + " words. \n")
+    newFile.write("     ✓ You changed " + str(words_changed) + " words with my suggestions. \n")
+    newFile.write("     ✓ You added " + str(added_words) + " words to the dictionary \n")
+    newFile.write("     ✓ The date and time that the program executed: " + str(datetime.now()) + "\n")
+    newFile.write("     ✓ The amount of time elapsed to spellcheck the input: " + str(end-start))
     newFile.write("\n")
     for z in the_list:
         newFile.write(z + " ")
@@ -220,28 +220,27 @@ while(enter_menu == '1'):
             os._exit(0)
         elif(choice=='1'):
             i = 1
-            time.sleep(2)
+            time.sleep(1)
             sentence = input("\nPlease enter your sentence: \n")
             wordList = sentence.split()
             total_words = len(wordList)
             wordList_modified=[]
-            print("\n")
             spell_check_sentence(wordList)
             end=time.time()
             createFile(wordList_modified)
 
         elif(choice == '2'):
             i = 1
-            time.sleep(2)
+            time.sleep(1)
             file_name = input("\nPlease write the name of your file:")
 
             if(os.path.exists(file_name) == True):
                 file_checked = open(file_name)
             else:
-                error_choice = 0
-                while(error_choice == 0 and os.path.exists(file_name) == False):
-                    error_choice = input("It seems your file doesn't exist. If you would like to return to the menu press 1 or if you want to write another file name press 0: ")
-                    file_name = input("Please write the name of your file:")
+                while(os.path.exists(file_name) == False):
+                    file_name= input("It seems your file doesn't exist. Please enter the correct name of your file ")
+
+
                 file_checked = open(file_name)
 
             fileList_modified=[]
