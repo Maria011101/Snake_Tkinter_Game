@@ -1,6 +1,6 @@
 #Graphics used from www.kenney.nl
 
-from tkinter import Tk, PhotoImage, Label, Canvas
+from tkinter import *
 import random, time
 
 
@@ -9,24 +9,23 @@ def configure_window():
     window.geometry("1920x1080")
     window.title("SPACE INVADERS")
 
-    
 #   Meteor Class
 class Meteor:
 
     def __init__(self):
         self.rand =random.randint(0,3)
         self.x = random.randint(0,1080)
-        self.meteor_y = 50
+        self.meteor_y = 0
         if(self.rand == 0):
             self.health = 3
             self.bigMeteorImage = None
             self.meteor = None
-            self.meteor_y = 50
+            self.meteor_y = 0
         else:
             self.health = 1
             self.smallMeteorImage = None
             self.meteor = None
-            self.meteor_y = 50
+            self.meteor_y = 0
 
     def place(self):
         if(self.rand == 0):
@@ -44,8 +43,6 @@ class Meteor:
             canvas1.move(self.meteor, 0, 5)
             self.meteor_y += 5
             canvas1.after(10, self.meteor_move)
-
-
 
 def left(event):
     global player_x
@@ -81,7 +78,7 @@ def shoot():
     global player_y
     global shot_in_action
     beam_speed = -5
-
+    global my_meteor1
 
     shot_in_action =  True
     shooting_beam = canvas1.create_image(player_x, player_y-50, image = beam)
@@ -90,6 +87,7 @@ def shoot():
 #Loop for moving the beam
     for i in range(2000):
         canvas1.move(shooting_beam, 0, beam_speed)
+        overlapping(shooting_beam, my_meteor1)
         time.sleep(0.001)
         #window.after(5)
         #time.sleep(0.02)
@@ -108,10 +106,10 @@ def is_shot(event):
     else:
         canvas1.update()
         shoot()
-def is_pressed():
-    return True
 
-
+def overlapping(item1, item2):
+    t=canvas1.find_overlapping(canvas1.bbox(item1)[0], canvas1.bbox(item1)[1], canvas1.bbox(item1)[2], canvas1.bbox(item1)[3])
+    print(t)
 
 window = Tk()
 
@@ -141,10 +139,9 @@ window.bind("<Right>",right)
 window.bind("<Up>", up)
 window.bind("<Down>", down)
 window.bind("<space>", is_shot)
-window.bind("q", is_pressed)
 
-for y in range(10):
 
+for y in range(20):
     my_meteor1 = Meteor()
     canvas1.after(random.randint(1000,10000), my_meteor1.place)
 
