@@ -8,7 +8,44 @@ import random, time
 def configure_window():
     window.geometry("1920x1080")
     window.title("SPACE INVADERS")
-    #window.iconbitmap('rocket.ico')
+
+    
+#   Meteor Class
+class Meteor:
+
+    def __init__(self):
+        self.rand =random.randint(0,3)
+        self.x = random.randint(0,1080)
+        self.meteor_y = 50
+        if(self.rand == 0):
+            self.health = 3
+            self.bigMeteorImage = None
+            self.meteor = None
+            self.meteor_y = 50
+        else:
+            self.health = 1
+            self.smallMeteorImage = None
+            self.meteor = None
+            self.meteor_y = 50
+
+    def place(self):
+        if(self.rand == 0):
+            self.bigMeteorImage = PhotoImage(file = "meteorBig.png")
+            self.meteor = canvas1.create_image(self.x, 50, image = self.bigMeteorImage)
+            self.meteor_move()
+        else:
+            self.smallMeteorImage = PhotoImage(file = "meteorSmall.png")
+            self.meteor = canvas1.create_image(self.x, 50, image = self.smallMeteorImage)
+            self.meteor_move()
+
+
+    def meteor_move(self):
+        if(self.meteor_y <1200):
+            canvas1.move(self.meteor, 0, 5)
+            self.meteor_y += 5
+            canvas1.after(10, self.meteor_move)
+
+
 
 def left(event):
     global player_x
@@ -71,23 +108,9 @@ def is_shot(event):
     else:
         canvas1.update()
         shoot()
+def is_pressed():
+    return True
 
-# def smallMeteorShoot():
-#     meteor_in_action = True
-#     meteor_speed = 5
-#     meteor_x = random.randint(0,1920)
-#     meteor_y = 0
-#     smallMeteor = canvas1.create_image(meteor_x, meteor_y, image = smallMeterorImage)
-#
-#     for i in range(2000):
-#         canvas1.move(smallMeteor, 0 , meteor_speed)
-#         window.after(100)
-#
-#         #time.sleep(0.2)
-#         meteor_y += 5
-#         if(meteor_y >= 1200):
-#             canvas1.itemconfig(smallMeteor, image='')
-#             break
 
 
 window = Tk()
@@ -110,25 +133,26 @@ player_image = canvas1.create_image(player_x, player_y, image = player)
 #Loading the beam image
 beam = PhotoImage(file = "laserGreen.png")
 
-#Loading the meteor image
-# smallMeterorImage = PhotoImage(file = "meteorSmall.png")
 
-# canvas1.after(100, smallMeteorShoot)
+
 #Binding the arrow keys to movement
 window.bind("<Left>", left)
 window.bind("<Right>",right)
 window.bind("<Up>", up)
 window.bind("<Down>", down)
 window.bind("<space>", is_shot)
+window.bind("q", is_pressed)
+
+for y in range(10):
+
+    my_meteor1 = Meteor()
+    canvas1.after(random.randint(1000,10000), my_meteor1.place)
 
 
-# while True:
-#     if(meteor_in_action == False):
-#         #canvas1.after(3)
-#         #time.sleep(0.1)
-#         smallMeteorShoot()
-#     else:
-#         continue
+    # my_meteor2 = Meteor()
+    # canvas1.after(random.randint(10000,50000), my_meteor2.meteor_move)
+
+
 
 
 window.mainloop()
