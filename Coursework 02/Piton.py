@@ -193,3 +193,41 @@ def play_game():
     placeFood()
     moveSnake()
     window.mainloop()
+
+def enter_username_page():
+    global username_window
+    global username
+
+    #This displays a warning if the username is empty
+    def validate_user_input():
+        if username.get() == '':
+            box.showwarning("Warning", "Please enter a valid name")
+        else:
+            play_game()
+
+#Creating the page and configuring it
+    username_window = Tk()
+    username_window.title("Welcome to PITON!")
+    username_window.geometry("350x250")
+    username_window.configure(bg = "#AEC5EB")
+    Label(text = "Enter username:", bg = "#AEC5EB", font = "Arial", fg = "#3A405A", pady =20).pack()
+
+#Creating the entry
+    username = Entry(username_window, width = 30, borderwidth = 2, bg = "#F9DEC9")
+    username.pack()
+
+
+    ok_button = Button(username_window, text = "Let's play!", bg ="#E9AFA3", padx = 10, pady = 10, command = validate_user_input)
+    ok_button.pack()
+
+    exit_button = Button(username_window, text = "Exit", bg ="#E9AFA3", padx = 10, pady = 10, command = username_window.destroy)
+    exit_button.pack()
+
+
+
+    username_window.mainloop()
+
+
+
+
+enter_username_page()
