@@ -8,8 +8,20 @@ def play_game():
     global window
     global canvas
     global direction
+    global menu_window
+    global food1
+    global food1X
+    global food1Y
+    global food2
+    global food2X
+    global food2Y
+    global width
+    global height
+    global portals_placed
+    global portals
 
-    username_window.destroy()
+
+    menu_window.destroy()
 
     def setWindowDimensions(w,h):
         window = Tk() #create window
@@ -23,7 +35,13 @@ def play_game():
         return window
 
     def placeFood():
-        global food1, food1X, food1Y, food2, food2X, food2Y
+        global food1
+        global food1X
+        global food1Y
+        global food2
+        global food2X
+        global food2Y
+
         food1 = canvas.create_rectangle( 0, 0, snakeSize, snakeSize, fill = "steel blue" )
         food1X = random.randint(0, width-snakeSize)
         food1Y = random.randint(0, height-snakeSize)
@@ -52,6 +70,8 @@ def play_game():
 
     #Moving the snake
     def moveSnake():
+        global portals_placed
+        global portals
         canvas.pack()
         positions = []
         positions.append(canvas.coords(snake[0])) #Adding the snake's head coords to the list
@@ -81,7 +101,7 @@ def play_game():
             canvas.move(snake[0], 0, snakeSize)
 
         sHeadPos = canvas.coords(snake[0])
-
+        #Checking to see if the snake collided with food
         foodPos1 = canvas.coords(food1)
         if overlapping(sHeadPos, foodPos1):
             moveFood()
@@ -102,9 +122,12 @@ def play_game():
             positions.append(canvas.coords(snake[i]))
         for i in range(len(snake)-1):
             canvas.coords(snake[i+1], positions[i][0], positions[i][1], positions[i][2], positions[i][3])
+
     #Looping through the function if gameOver is False
         if 'gameOver' not in locals():
             window.after(90, moveSnake)
+        else:
+            endScreen()
 
     def moveFood():
         global food1, food1X, food1Y, food2, food2X, food2Y
@@ -124,15 +147,19 @@ def play_game():
         lastElementPos = canvas.coords(snake[lastElement])
         snake.append(canvas.create_rectangle(0, 0, snakeSize, snakeSize, fill="#FDF3F3"))
 
+#adding  a block to the right of the last one if the direction is left
         if (direction == "left"):
-            canvas.coords(snake[lastElement+1], lastElementPos[0]+snakeSize, lastElementPos[1], lastElementPos[2]+snakeSize, lastElementPos[3])
+            canvas.coords(snake[lastElement+1], lastElementPos[0] + snakeSize, lastElementPos[1], lastElementPos[2] + snakeSize, lastElementPos[3])
 
+#adding  a block to the left of the last one if the direction is right
         elif (direction == "right"):
-            canvas.coords(snake[lastElement+1], lastElementPos[0] + snakeSize, lastElementPos[1], lastElementPos[2] - snakeSize, lastElementPos[3])
+            canvas.coords(snake[lastElement+1], lastElementPos[0] - snakeSize, lastElementPos[1], lastElementPos[2] - snakeSize, lastElementPos[3])
 
+#adding  a block under the last one if the direction is up
         elif (direction == "up"):
             canvas.coords(snake[lastElement+1], lastElementPos[0], lastElementPos[1] + snakeSize, lastElementPos[2], lastElementPos[3]+snakeSize)
 
+#adding  a block above the last one if the direction is down
         else:
             canvas.coords(snake[lastElement+1], lastElementPos[0], lastElementPos[1]-snakeSize, lastElementPos[2], lastElementPos[3]-snakeSize)
 
@@ -166,8 +193,20 @@ def play_game():
         else:
             return False
 
-    width = 1080 # width of snake’s world
-    height = 1920 # height of snake’s world
+
+
+     def endScreen():
+        global end_screen
+        global end_score
+
+        end_screen = canvas.create_rectangle(0, 0 , 800, 800)
+        end_screen.pack()
+
+        end_score = Label(window, text = "Your Score:" + str(score), font = ("Times 20 italic bold"))
+
+
+    width = 1000 # width of snake’s world
+    height = 850 # height of snake’s world
 
     #creating the window
     window = setWindowDimensions(width, height)
@@ -176,7 +215,7 @@ def play_game():
     #Creating the snake
     snake = []
     snakeSize = 20
-    snake.append(canvas.create_rectangle(snakeSize,snakeSize, snakeSize * 2, snakeSize * 2, fill = "white" ))
+    snake.append(canvas.create_rectangle(snakeSize, snakeSize, snakeSize * 2, snakeSize * 2, fill = "white" ))
 
     score = 0 #the score starts at 0
     txt = "Score:" + str(score)
@@ -190,10 +229,52 @@ def play_game():
     canvas.focus_set()
     direction = "right"
 
+
     placeFood()
     moveSnake()
     window.mainloop()
 
+#This displays the menu page
+def menu_page():
+    global menu_window
+    global username_window
+
+    #destroying the enter username window
+    username_window.destroy()
+
+    menu_window = Tk()
+    menu_window.title("P I T O N")
+    menu_window.geometry("1080x1920")
+    menu_window.configure( bg = "#ABC798")
+
+    #Title
+    menuTitle = Label(menu_window, text = "MENU", bg = "#ABC798", fg = "#1A1F16", font = ("Arial, 50"))
+    menuTitle.place( x = 450, y = 100)
+
+    #Menu Buttons
+
+    playButton = Button(text = "Start", bg = "#5D737E", activebackground = "#D68C45", height = 2 ,width = 15, font = ("Arial, 15"), command = play_game)
+    playButton.place( x = 200, y = 300)
+
+    rulesButton = Button(text = "Rules", bg = "#5D737E", activebackground = "#D68C45", height = 2 ,width = 15, font = ("Arial, 15"))
+    rulesButton.place( x = 200, y = 400)
+
+    settingsButton = Button(text = "Settings", bg = "#5D737E", activebackground = "#D68C45", height = 2 ,width = 15, font = ("Arial, 15"))
+    settingsButton.place( x = 200, y = 500)
+
+    exitButton = Button(text = "Exit", bg = "#5D737E", activebackground = "#D68C45", height = 2 ,width = 15, font = ("Arial, 15"), command = menu_window.destroy)
+    exitButton.place( x = 200, y = 600)
+
+    #Menu picture of snake
+    pythonImage = PhotoImage(file = "snake.png")
+    python = Label(image = pythonImage , bg = "#ABC798")
+    python.place( x = 500, y = 400)
+
+
+
+    menu_window.mainloop()
+
+#A page where we get the username
 def enter_username_page():
     global username_window
     global username
@@ -203,7 +284,7 @@ def enter_username_page():
         if username.get() == '':
             box.showwarning("Warning", "Please enter a valid name")
         else:
-            play_game()
+            menu_page()
 
 #Creating the page and configuring it
     username_window = Tk()
