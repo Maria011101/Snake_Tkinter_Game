@@ -328,7 +328,21 @@ def rules_page():
 	rule_window.geometry("1080x1920")
 	rule_window.configure( bg = "#ABC798")
 
+	
+
 	Label(rule_window, text = "Game Rules", bg = "#ABC798", fg = "#1A1F16", font = ("Arial, 50")).place(x = 300, y = 50)
+
+	yellowfoodButton = Button(rule_window, bg = "#FEFFA5", activebackground = "#FEFFA5", height = 1, width = 1)
+	yellowfoodButton.place(x = 100, y = 200)
+
+	Label(rule_window, text = "-This food adds one block at the tail of the snake, while adding 10 points to the score.", bg = "#ABC798", fg = "#1A1F16", font = ("Arial, 20")).place(x = 150, y = 200)
+
+	redfoodButton = Button(rule_window, bg = "#931F1D", activebackground = "#931F1D", height = 1, width = 1)
+	redfoodButton.place(x = 100, y = 300)
+
+	Label(rule_window, text = "-This food adds two blocks at the tail of the snake, while adding 10 points to the score.", bg = "#ABC798", fg = "#1A1F16", font = ("Arial, 20")).place(x = 150, y = 300)
+
+	Label(rule_window, text = "< Cheat Code > - Press 'p' to add 20 points to your score.", bg = "#ABC798", fg = "#1A1F16", font = ("Arial, 20")).place(x = 100, y = 400)
 
 	backButton = Button(rule_window, text = "Back", bg = "#5D737E", activebackground = "#D68C45", height = 1 ,width = 5, font = ("Arial, 15"), command = backfrules)
 	backButton.place( x = 50, y = 10)
