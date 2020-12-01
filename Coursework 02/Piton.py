@@ -20,6 +20,8 @@ def play_game():
     global portals_placed
     global portals
     global Obstacles
+    global pause
+    pause = False
 
 
     menu_window.destroy()
@@ -110,6 +112,7 @@ def play_game():
             moveFood()
             growSnake(grow_2blocks)
 
+         #Checking to see if the snake collided with itself
         for i in range(1,len(snake)):
             if overlapping(sHeadPos, canvas.coords(snake[i])):
                 gameOver = True
@@ -122,12 +125,19 @@ def play_game():
 
     	#Looping through the function if gameOver is False
         if 'gameOver' not in locals():
-            window.after(90, moveSnake)
+        	if pause:
+        		pass
+        	else:
+        		window.after(90, moveSnake)
         else:
             endScreen()
 
+       
+
     def moveFood():
         global food1, food1X, food1Y, food2, food2X, food2Y
+
+        #randomly moving the food on the canvas
         canvas.move(food1, (food1X*(-1)), (food1Y*(-1)))
         food1X = random.randint(0,width-snakeSize)
         food1Y = random.randint(0,height-snakeSize)
@@ -191,7 +201,6 @@ def play_game():
         else:
             return False
     	
-
     # def createObstacle(x, y):
     # 	global Ob
     # 	Ob = canvas.create_rectangle(x, y, x + 20, y + 100, fill = "white")
@@ -227,6 +236,15 @@ def play_game():
     def backToMenu():
         window.destroy()
         menu_page()
+
+    def pause_game(event):
+    	global pause
+    	global canvas
+    	pause = True
+
+    	pauseText = canvas.create_text((400, 400), text = "Game Paused", fill = "red", font = "Arial 50")
+
+
     
 
     width = 1000 # width of snake’s world
@@ -250,7 +268,8 @@ def play_game():
     canvas.bind("<Right>", rightKey)
     canvas.bind("<Up>", upKey)
     canvas.bind("<Down>", downKey)
-    canvas.bind("p", CheatCode1)
+    canvas.bind("c", CheatCode1)
+    canvas.bind("p", pause_game)
     canvas.focus_set()
     direction = "right"
 
