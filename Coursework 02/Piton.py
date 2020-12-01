@@ -451,26 +451,63 @@ def rules_page():
     rule_window.geometry("1080x1920")
     rule_window.configure(bg="#ABC798")
 
-	
+    Label(
+        rule_window,
+        text="Game Rules",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 50")).place(x=300, y=50)
 
-	Label(rule_window, text="Game Rules", bg="#ABC798", fg="#1A1F16", font=("Arial, 50")).place(x=300, y=50)
+    yellowfoodButton = Button(
+        rule_window,
+        bg="#FEFFA5",
+        activebackground="#FEFFA5",
+        height=1,
+        width=1)
+    yellowfoodButton.place(x=100, y=200)
 
-	yellowfoodButton = Button(rule_window, bg="#FEFFA5", activebackground="#FEFFA5", height=1, width=1)
-	yellowfoodButton.place(x=100, y=200)
+    Label(
+        rule_window,
+        text="-This food adds one block at the tail of the snake, while adding 10 points to the score.",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 20")).place(x=150, y=200)
 
-	Label(rule_window, text="-This food adds one block at the tail of the snake, while adding 10 points to the score.", bg="#ABC798", fg="#1A1F16", font=("Arial, 20")).place(x=150, y=200)
+    redfoodButton = Button(
+        rule_window,
+        bg="#931F1D",
+        activebackground="#931F1D",
+        height=1,
+        width=1)
+    redfoodButton.place(x=100, y=300)
 
-	redfoodButton = Button(rule_window, bg = "#931F1D", activebackground = "#931F1D", height = 1, width = 1)
-	redfoodButton.place(x = 100, y = 300)
+    Label(
+        rule_window,
+        text="-This food adds two blocks at the tail of the snake, while adding 10 points to the score.",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 20")).place(x=150, y=300)
 
-	Label(rule_window, text = "-This food adds two blocks at the tail of the snake, while adding 10 points to the score.", bg = "#ABC798", fg = "#1A1F16", font = ("Arial, 20")).place(x = 150, y = 300)
+    Label(
+        rule_window,
+        text="< Cheat Code > - Press 'p' to add 20 points to your score.",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 20")).place(x=100, y=400)
 
-	Label(rule_window, text = "< Cheat Code > - Press 'p' to add 20 points to your score.", bg = "#ABC798", fg = "#1A1F16", font = ("Arial, 20")).place(x = 100, y = 400)
+    backButton = Button(
+        rule_window,
+        text="Back",
+        bg="#5D737E",
+        activebackground="#D68C45",
+        height=1,
+        width=5,
+        font=("Arial, 15"),
+        command=backfrules)
+    backButton.place(x=50, y=10)
 
-	backButton = Button(rule_window, text = "Back", bg = "#5D737E", activebackground = "#D68C45", height = 1 ,width = 5, font = ("Arial, 15"), command = backfrules)
-	backButton.place( x = 50, y = 10)
+    rule_window.mainloop()
 
-	rule_window.mainloop()
 
 # This displays the menu page
 def menu_page():
@@ -557,34 +594,51 @@ def menu_page():
     python = Label(image=pythonImage, bg="#ABC798")
     python.place(x=500, y=400)
 
-#A page where we get the username
+
+# A page where we get the username
 def enter_username_page():
     global username_window
     global username
 
-    #This displays a warning if the username is empty
+    # This displays a warning if the username is empty
     def validate_user_input():
         if username.get() == '':
             box.showwarning("Warning", "Please enter a valid name")
         else:
             menu_page()
 
-	#Creating the page and configuring it
+    # Creating the page and configuring it
     username_window = Tk()
     username_window.title("Welcome to PITON!")
     username_window.geometry("350x250")
     username_window.configure(bg="#AEC5EB")
-    Label(text="Enter username:", bg="#AEC5EB", font="Arial", fg="#3A405A", pady=20).pack()
+    Label(
+        text="Enter username:",
+        bg="#AEC5EB",
+        font="Arial",
+        fg="#3A405A",
+        pady=20).pack()
 
-	#Creating the entry
+    # Creating the entry
     username = Entry(username_window, width=30, borderwidth=2, bg="#F9DEC9")
     username.pack()
 
-
-    ok_button = Button(username_window, text="Let's play!", bg="#E9AFA3", padx = 10, pady=10, command=validate_user_input)
+    ok_button = Button(
+        username_window,
+        text="Let's play!",
+        bg="#E9AFA3",
+        padx=10,
+        pady=10,
+        command=validate_user_input)
     ok_button.pack()
 
-    exit_button = Button(username_window, text="Exit", bg="#E9AFA3", padx=10, pady=10, command=username_window.destroy)
+    exit_button = Button(
+        username_window,
+        text="Exit",
+        bg="#E9AFA3",
+        padx=10,
+        pady=10,
+        command=username_window.destroy)
     exit_button.pack()
 
     username_window.mainloop()
