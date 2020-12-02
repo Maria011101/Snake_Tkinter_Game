@@ -32,7 +32,7 @@ def play_game():
 
     def setWindowDimensions(w, h):
         window = Tk()  # create window
-        window.title("Snake Game")  # title of window
+        window.title("PITON Game")  # title of window
         window.geometry("1080x1920")
         return window
 
@@ -165,7 +165,10 @@ def play_game():
                 positions[i][2],
                 positions[i][3])
         if resume:
-            window.after(90, moveSnake)
+            resume = False
+            pause = False
+            pause1 = False
+            # window.after(90, moveSnake)
 
         # Looping through the function if gameOver is False
         if 'gameOver' not in locals():
@@ -298,7 +301,6 @@ def play_game():
 
     # 	def moveObstacle():
     # 		global Ob
-    # 		for i in range(1000):
     # 			canvas.move(Ob, 10, 10)
 
     # 	canvas.after(1000, moveObstacle)
@@ -349,21 +351,11 @@ def play_game():
         global pauseText1
         global resume
         global pauseText2
-
-        resume = True
-        pause = False
-        pause1 = False
-        canvas.delete(pauseText1)
-        canvas.delete(pauseText2)
-        canvas.bind("<Left>", leftKey)
-        canvas.bind("<Right>", rightKey)
-        canvas.bind("<Up>", upKey)
-        canvas.bind("<Down>", downKey)
-        canvas.bind("c", CheatCode1)
-        canvas.bind("p", pause_game)
-        canvas.bind("r", resume_game)
-        canvas.focus_set()
-        window.after(90, moveSnake)
+        if pause == True:
+            resume = True
+            canvas.delete(pauseText1)
+            canvas.delete(pauseText2)
+            moveSnake()
 
     def pause_game(event):
         global pause
@@ -372,9 +364,8 @@ def play_game():
         global pauseText1
         global pauseText2
 
-        pause = True
-
-        if not pause1:
+        if not pause:
+            pause = True
             pause1 = True
             pauseText1 = canvas.create_text(
                 (450, 350),
@@ -590,9 +581,11 @@ def menu_page():
     exitButton.place(x=200, y=700)
 
     # Menu picture of snake
-    pythonImage = PhotoImage(file="snake.png")
-    python = Label(image=pythonImage, bg="#ABC798")
-    python.place(x=500, y=400)
+    snakeImage = PhotoImage(file="converted.gif")
+    snake = Label(menu_window, image=snakeImage, bg="#ABC798")
+    snake.place(x=450, y=400)
+
+    menu_window.mainloop()
 
 
 # A page where we get the username
@@ -602,10 +595,12 @@ def enter_username_page():
 
     # This displays a warning if the username is empty
     def validate_user_input():
-        if username.get() == '':
-            box.showwarning("Warning", "Please enter a valid name")
-        else:
-            menu_page()
+        for character in username.get():
+            if  not character in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ1234567890":
+                box.showwarning("Warning", "Usernames can only contain letters and numbers.")
+                break
+            else:
+                menu_page()
 
     # Creating the page and configuring it
     username_window = Tk()
@@ -630,7 +625,7 @@ def enter_username_page():
         padx=10,
         pady=10,
         command=validate_user_input)
-    ok_button.pack()
+    ok_button.place(x=125, y=100)
 
     exit_button = Button(
         username_window,
@@ -639,7 +634,7 @@ def enter_username_page():
         padx=10,
         pady=10,
         command=username_window.destroy)
-    exit_button.pack()
+    exit_button.place(x=150, y=150)
 
     username_window.mainloop()
 
