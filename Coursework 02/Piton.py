@@ -2,6 +2,22 @@ from tkinter import *
 import tkinter.messagebox as box
 import random
 
+# global variables for customization
+global backgroundColour
+global snakeHead
+global snakeColour
+global up
+global down
+global right
+global left
+snakeHead = "#60992D"
+snakeColour = "#ABC798"
+backgroundColour = "#1A1F16"
+up = '<Up>'
+down = '<Down>'
+right = '<Right>'
+left= '<Left>'
+
 
 # This function runs the game
 def play_game():
@@ -18,15 +34,14 @@ def play_game():
     global food2Y
     global width
     global height
-    global portals_placed
-    global portals
-    global Obstacles
     global pause
     global pause1
     global resume
+    global snakeColour
     pause = False
     pause1 = False
     resume = False
+    obstacle = []
 
     menu_window.destroy()
 
@@ -74,13 +89,13 @@ def play_game():
 
     # Moving the snake
     def moveSnake():
-        global portals_placed
-        global portals
         global pause
         global pause1
         global resume
+        global obstacle
 
         pause1 = False
+        obstacle = None
         canvas.pack()
         positions = []
         positions.append(canvas.coords(snake[0]))
@@ -155,6 +170,7 @@ def play_game():
                     font="Times 20 italic bold",
                     text="Game Over!")
 
+        # Making each part of the body follow the previous one
         for i in range(1, len(snake)):
             positions.append(canvas.coords(snake[i]))
         for i in range(len(snake)-1):
@@ -164,11 +180,26 @@ def play_game():
                 positions[i][1],
                 positions[i][2],
                 positions[i][3])
+
+        # Resets the pausing and resuming booleans
+        # so it will be able to continue
         if resume:
             resume = False
             pause = False
             pause1 = False
-            # window.after(90, moveSnake)
+
+        # if score > 30:
+        #     if len(obstacle) == 0:
+        #         xrand = random.randint(0, 1900)
+        #         obstacle.append(
+        #             canvas.create_rectangle(
+        #                 xrand,
+        #                 0,
+        #                 xrand + 20,
+        #                 100,
+        #                 fill = "white"))
+        #     else:
+        #         canvas.move(obstacle[0], 0, 10)
 
         # Looping through the function if gameOver is False
         if 'gameOver' not in locals():
@@ -204,7 +235,7 @@ def play_game():
                 0,
                 snakeSize,
                 snakeSize,
-                fill="#ABC798"))
+                fill=snakeColour))
 
         # adding  a block to the right of the last one if the direction is left
         if (direction == "left"):
@@ -250,7 +281,7 @@ def play_game():
                     0,
                     snakeSize,
                     snakeSize,
-                    fill="#ABC798"))
+                    fill=snakeColour))
 
             if (direction == "left"):
                 canvas.coords(
@@ -294,16 +325,6 @@ def play_game():
             return True
         else:
             return False
-
-    # def createObstacle(x, y):
-    # 	global Ob
-    # 	Ob = canvas.create_rectangle(x, y, x + 20, y + 100, fill = "white")
-
-    # 	def moveObstacle():
-    # 		global Ob
-    # 			canvas.move(Ob, 10, 10)
-
-    # 	canvas.after(1000, moveObstacle)
 
     def endScreen():
         global end_screen
@@ -351,7 +372,7 @@ def play_game():
         global pauseText1
         global resume
         global pauseText2
-        if pause == True:
+        if pause:
             resume = True
             canvas.delete(pauseText1)
             canvas.delete(pauseText2)
@@ -384,7 +405,8 @@ def play_game():
 
     # creating the window
     window = setWindowDimensions(width, height)
-    canvas = Canvas(window, bg="#1A1F16", width=width, height=height)
+    global backgroundColour
+    canvas = Canvas(window, bg=backgroundColour, width=width, height=height)
 
     # creating the snake
     snake = []
@@ -395,7 +417,7 @@ def play_game():
             snakeSize,
             snakeSize * 2,
             snakeSize * 2,
-            fill="#60992D"))
+            fill=snakeHead))
 
     score = 0  # the score starts at 0
     txt = "Score:" + str(score)
@@ -407,10 +429,10 @@ def play_game():
         font="Times 20 italic bold",
         text=txt)
 
-    canvas.bind("<Left>", leftKey)
-    canvas.bind("<Right>", rightKey)
-    canvas.bind("<Up>", upKey)
-    canvas.bind("<Down>", downKey)
+    canvas.bind(left, leftKey)
+    canvas.bind(right, rightKey)
+    canvas.bind(up, upKey)
+    canvas.bind(down, downKey)
     canvas.bind("c", CheatCode1)
     canvas.bind("p", pause_game)
     canvas.bind("r", resume_game)
@@ -431,6 +453,14 @@ def backfrules():
     menu_page()
 
 
+# gets you back from settings to the menu page
+def backfsettings():
+    global settings_window
+    settings_window.destroy()
+    menu_page()
+
+
+# displays the rules and information page
 def rules_page():
     global rule_window
     global menu_window
@@ -459,7 +489,7 @@ def rules_page():
 
     Label(
         rule_window,
-        text="-This food adds one block at the tail of the snake, while adding 10 points to the score.",
+        text="-This food adds one block at the tail of the snake, \nwhile adding 10 points to the score.",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=150, y=200)
@@ -474,17 +504,31 @@ def rules_page():
 
     Label(
         rule_window,
-        text="-This food adds two blocks at the tail of the snake, while adding 10 points to the score.",
+        text="-This food adds two blocks at the tail of the snake, \nwhile adding 10 points to the score.",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=150, y=300)
 
     Label(
         rule_window,
-        text="< Cheat Code > - Press 'p' to add 20 points to your score.",
+        text="< Cheat Code > - Press 'c' to add 20 points to your score.",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=100, y=400)
+
+    Label(
+        rule_window,
+        text="- Press 'p' to add pause the game.",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 20")).place(x=100, y=450)
+
+    Label(
+        rule_window,
+        text="- Press 'r' to resume the game.",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 20")).place(x=100, y=500)
 
     backButton = Button(
         rule_window,
@@ -498,6 +542,211 @@ def rules_page():
     backButton.place(x=50, y=10)
 
     rule_window.mainloop()
+
+
+# function to change background colour to green
+def changeToGreen():
+    global backgroundColour
+    backgroundColour = "#1A1F16"
+    box.showinfo("Done!", "Selected dark green!")
+
+
+# function to change background colour to blue
+def changeToBlue():
+    global backgroundColour
+    backgroundColour = "#05204A"
+    box.showinfo("Done!", "Selected blue!")
+
+
+# function to change background colour to beige
+def changeToBeige():
+    global backgroundColour
+    backgroundColour = "#EFF0D1"
+    box.showinfo("Done!", "Selected beige!")
+
+
+# function to change background colour to pink
+def changeToPurple():
+    global backgroundColour
+    backgroundColour = "#511730"
+    box.showinfo("Done!", "Selected purple!")
+
+
+# function to change snake colour to green
+def snakeGreen():
+    global snakeHead
+    global snakeColour
+    snakeHead = "#60992D"
+    snakeColour = "#ABC798"
+    box.showinfo("Done!", "Selected green!")
+
+
+# function to change snake colour to pink
+def snakePink():
+    global snakeHead
+    global snakeColour
+    snakeHead = "#8E3B46"
+    snakeColour = "#FE938C"
+    box.showinfo("Done!", "Selected pink!")
+
+
+def letterControl():
+    global up
+    global down
+    global right
+    global left
+
+    box.showinfo("Done!", "Selected the letters as controls!")
+    up = 'w'
+    down = 's'
+    right = 'd'
+    left = 'a'
+
+
+def arrowsControl():
+    global up
+    global down
+    global right
+    global left
+
+    box.showinfo("Done!", "Selected the arrows as controls!")
+    up = "<Up>"
+    down = "<Down>"
+    right = "<Right>"
+    left= "<Left>"
+
+#Settings and customization page
+def settings_page():
+    global settings_window
+    global menu_page
+    global backgroundColour
+    menu_window.destroy()
+
+    settings_window = Tk()
+    settings_window.title("Settings")
+    settings_window.geometry("1080x1920")
+    settings_window.configure(bg="#ABC798")
+
+    backButton = Button(
+        settings_window,
+        text="Back",
+        bg="#5D737E",
+        activebackground="#D68C45",
+        height=1,
+        width=5,
+        font=("Arial, 15"),
+        command=backfsettings)
+    backButton.place(x=50, y=10)
+
+    Label(
+        settings_window,
+        text="Settings",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 50")).place(x=350, y=50)
+
+    Label(
+        settings_window,
+        text="Background colour:",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 20")).place(x=100, y=200)
+
+    colourButton1 = Button(
+        settings_window,
+        bg="#1A1F16",
+        height=5,
+        width=10,
+        command=changeToGreen)
+    colourButton1.place(x=100, y=250)
+
+    colourButton2 = Button(
+        settings_window,
+        bg="#05204A",
+        height=5,
+        width=10,
+        command=changeToBlue)
+    colourButton2.place(x=300, y=250)
+
+    colourButton3 = Button(
+        settings_window,
+        bg="#EFF0D1",
+        height=5,
+        width=10,
+        command=changeToBeige)
+    colourButton3.place(x=500, y=250)
+
+    colourButton4 = Button(
+        settings_window,
+        bg="#511730",
+        height=5,
+        width=10,
+        command=changeToPurple)
+    colourButton4.place(x=700, y=250)
+
+    Label(
+        settings_window,
+        text="Snake colour:",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 20")).place(x=100, y=400)
+
+    colourButton5 = Button(
+        settings_window,
+        bg="#60992D",
+        height=5,
+        width=10,
+        command=snakeGreen)
+    colourButton5.place(x=100, y=450)
+
+    colourButton6 = Button(
+        settings_window,
+        bg="#8E3B46",
+        height=5,
+        width=10,
+        command=snakePink)
+    colourButton6.place(x=300, y=450)
+
+    Label(
+        settings_window,
+        text="Controls:",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 20")).place(x=100, y=600)
+
+    wasdcontrol = Button(
+        settings_window,
+        bg="#5D737E",
+        activebackground="#D68C45",
+        height=2,
+        width=2,
+        command=letterControl)
+    wasdcontrol.place(x=100, y=650)
+
+    Label(
+        settings_window,
+        text="Press this button to change the controls into\n 'w'-up, 'a'-right, 's'-down, 'd'-left",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 15")).place(x=200, y=650)
+
+    arrowscontrol = Button(
+        settings_window,
+        bg="#5D737E",
+        activebackground="#D68C45",
+        height=2,
+        width=2,
+        command=arrowsControl)
+    arrowscontrol.place(x=100, y=750)
+
+    Label(
+        settings_window,
+        text="Press this button to change the controls into\n '<Up>'-up, '<Right>'-right, '<Down>'-down, '<Left>'-left",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 15")).place(x=150, y=750)
+
+    settings_window.mainloop()
 
 
 # This displays the menu page
@@ -566,7 +815,8 @@ def menu_page():
         activebackground="#D68C45",
         height=2,
         width=15,
-        font=("Arial, 15"))
+        font=("Arial, 15"),
+        command=settings_page)
     settingsButton.place(x=200, y=600)
 
     exitButton = Button(
@@ -596,8 +846,10 @@ def enter_username_page():
     # This displays a warning if the username is empty
     def validate_user_input():
         for character in username.get():
-            if  not character in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ1234567890":
-                box.showwarning("Warning", "Usernames can only contain letters and numbers.")
+            if character not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ1234567890":
+                box.showwarning(
+                    "Warning",
+                    "Usernames can only contain letters and numbers.")
                 break
             else:
                 menu_page()
