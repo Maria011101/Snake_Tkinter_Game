@@ -1,6 +1,7 @@
 from tkinter import *
 import tkinter.messagebox as box
 import random
+import sys
 
 # global variables for customization
 global backgroundColour
@@ -10,20 +11,20 @@ global up
 global down
 global right
 global left
+global menu_window
 snakeHead = "#60992D"
 snakeColour = "#ABC798"
 backgroundColour = "#1A1F16"
 up = '<Up>'
 down = '<Down>'
 right = '<Right>'
-left= '<Left>'
+left = '<Left>'
 
 
 # This function runs the game
 def play_game():
     global score
     global window
-    global canvas
     global direction
     global menu_window
     global food1
@@ -92,8 +93,6 @@ def play_game():
         global pause
         global pause1
         global resume
-        global obstacle
-
         pause1 = False
         obstacle = None
         canvas.pack()
@@ -327,9 +326,6 @@ def play_game():
             return False
 
     def endScreen():
-        global end_screen
-        global end_score
-
         end_screen = canvas.create_rectangle(0, 0, 1000, 850, fill="#ABC798")
 
         game_over = Label(
@@ -380,7 +376,6 @@ def play_game():
 
     def pause_game(event):
         global pause
-        global canvas
         global pause1
         global pauseText1
         global pauseText2
@@ -489,7 +484,8 @@ def rules_page():
 
     Label(
         rule_window,
-        text="-This food adds one block at the tail of the snake, \nwhile adding 10 points to the score.",
+        text="-This food adds one block at the tail of the snake,"
+        " \nwhile adding 10 points to the score.",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=150, y=200)
@@ -504,7 +500,8 @@ def rules_page():
 
     Label(
         rule_window,
-        text="-This food adds two blocks at the tail of the snake, \nwhile adding 10 points to the score.",
+        text="-This food adds two blocks at the tail of the snake,"
+        " \nwhile adding 10 points to the score.",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=150, y=300)
@@ -613,12 +610,13 @@ def arrowsControl():
     up = "<Up>"
     down = "<Down>"
     right = "<Right>"
-    left= "<Left>"
+    left = "<Left>"
 
-#Settings and customization page
+
+# Settings and customization page
 def settings_page():
     global settings_window
-    global menu_page
+    global menu_window
     global backgroundColour
     menu_window.destroy()
 
@@ -725,7 +723,8 @@ def settings_page():
 
     Label(
         settings_window,
-        text="Press this button to change the controls into\n 'w'-up, 'a'-right, 's'-down, 'd'-left",
+        text="Press this button to change the controls into\n "
+        "'w'-up, 'a'-right, 's'-down, 'd'-left",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 15")).place(x=200, y=650)
@@ -741,7 +740,8 @@ def settings_page():
 
     Label(
         settings_window,
-        text="Press this button to change the controls into\n '<Up>'-up, '<Right>'-right, '<Down>'-down, '<Left>'-left",
+        text="Press this button to change the controls into\n "
+        "'<Up>'-up, '<Right>'-right, '<Down>'-down, '<Left>'-left",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 15")).place(x=150, y=750)
@@ -751,8 +751,8 @@ def settings_page():
 
 # This displays the menu page
 def menu_page():
-    global menu_window
     global username_window
+    global menu_window
 
     # destroying the enter username window
     try:
@@ -768,12 +768,19 @@ def menu_page():
     # Title
     menuTitle = Label(
         menu_window,
-        text="MENU",
+        text="P I T O N",
         bg="#ABC798",
         fg="#1A1F16",
-        font=("Arial, 50"))
-    menuTitle.place(x=450, y=100)
+        font=("Helvetica, 50"))
+    menuTitle.place(x=350, y=100)
 
+    menuTitleSmall = Label(
+        menu_window,
+        text=" M E N U",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Helvetica, 35"))
+    menuTitleSmall.place(x=200, y=240)
     # Menu Buttons
 
     playButton = Button(
@@ -827,7 +834,7 @@ def menu_page():
         height=2,
         width=15,
         font=("Arial, 15"),
-        command=menu_window.destroy)
+        command=sys.exit)
     exitButton.place(x=200, y=700)
 
     # Menu picture of snake
