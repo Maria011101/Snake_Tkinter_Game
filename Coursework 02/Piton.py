@@ -12,6 +12,7 @@ global down
 global right
 global left
 global menu_window
+global leaderboard_window
 snakeHead = "#60992D"
 snakeColour = "#ABC798"
 backgroundColour = "#1A1F16"
@@ -455,6 +456,57 @@ def backfsettings():
     menu_page()
 
 
+# gets you back from leaderboard to the menu page
+def backfleaderboard():
+    global leaderboard_window
+    leaderboard_window.destroy()
+    menu_page()
+
+def leaderboard_manage():
+    global username
+    leaderboard = {}
+    leaders = open("leaderboard.txt", 'a')
+    if username.get() in leaders:
+        if bestScore < end_score:
+            bestScore = endscore
+    else:
+        pass
+
+
+
+def leaderboard_page():
+    global leaderboard_window
+    global menu_window
+    menu_window.destroy()
+    leaderboard_window = Tk()
+    leaderboard_window.title("Leaderboard")
+    leaderboard_window.geometry("1080x1920")
+    leaderboard_window.configure(bg="#ABC798")
+
+    backButton = Button(
+        leaderboard_window,
+        text="Back",
+        bg="#5D737E",
+        activebackground="#D68C45",
+        height=1,
+        width=5,
+        font=("Arial, 15"),
+        command=backfleaderboard)
+    backButton.place(x=50, y=10)
+
+    # scroll = Scrollbar(leaderboard_window, bg="#D68C45", orient=VERTICAL)
+    # scroll.pack()
+
+    Label(
+        rule_window,
+        text="Leaderboard",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 50")).place(x=300, y=50)
+
+    leaderboard_window.mainloop()
+
+
 # displays the rules and information page
 def rules_page():
     global rule_window
@@ -587,6 +639,7 @@ def snakePink():
     box.showinfo("Done!", "Selected pink!")
 
 
+# function to change the controls to the letters
 def letterControl():
     global up
     global down
@@ -600,6 +653,7 @@ def letterControl():
     left = 'a'
 
 
+# function to change the controls to the arrows
 def arrowsControl():
     global up
     global down
@@ -781,6 +835,7 @@ def menu_page():
         fg="#1A1F16",
         font=("Helvetica, 35"))
     menuTitleSmall.place(x=200, y=240)
+    
     # Menu Buttons
 
     playButton = Button(
@@ -812,7 +867,8 @@ def menu_page():
         activebackground="#D68C45",
         height=2,
         width=15,
-        font=("Arial, 15"))
+        font=("Arial, 15"),
+        command=leaderboard_page)
     leaderboardButton.place(x=200, y=500)
 
     settingsButton = Button(
