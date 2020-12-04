@@ -2,6 +2,7 @@ from tkinter import *
 import tkinter.messagebox as box
 import random
 import sys
+import json
 
 # global variables for customization
 global backgroundColour
@@ -11,8 +12,11 @@ global up
 global down
 global right
 global left
-global menu_window
-global leaderboard_window
+# other globals
+global name
+global bestScore
+
+name = None
 snakeHead = "#60992D"
 snakeColour = "#ABC798"
 backgroundColour = "#1A1F16"
@@ -462,18 +466,36 @@ def backfleaderboard():
     leaderboard_window.destroy()
     menu_page()
 
+
 def leaderboard_manage():
-    global username
+    global name
+    global bestScore
+    global score
     leaderboard = {}
-    leaders = open("leaderboard.txt", 'a')
-    if username.get() in leaders:
-        if bestScore < end_score:
-            bestScore = endscore
+    try:
+        with open('leaderboard.txt') as leaders:
+            leaderboard = json.load(leaders)
+            leaders.close()
+    except FileNotFoundError:
+        leaders = open("leaderboard.txt", 'x')
+        leaderboard = {}
+
+    if name not in leaderboard:
+        leaderboard[name] = 0
     else:
-        pass
+        bestScore = leaderboard[name]
+
+    with open('leaderboard.txt', 'w') as outfile:
+        json.dump(leaderboard, outfile)
+
+    # if username.get() not in leaders:
+    #     if bestScore < end_score:
+    #         bestScore = endscore
+    # else:
+    #     pass
 
 
-
+# Leaderboard page
 def leaderboard_page():
     global leaderboard_window
     global menu_window
@@ -482,6 +504,8 @@ def leaderboard_page():
     leaderboard_window.title("Leaderboard")
     leaderboard_window.geometry("1080x1920")
     leaderboard_window.configure(bg="#ABC798")
+
+    leaderboard_manage()
 
     backButton = Button(
         leaderboard_window,
@@ -498,7 +522,7 @@ def leaderboard_page():
     # scroll.pack()
 
     Label(
-        rule_window,
+        leaderboard_window,
         text="Leaderboard",
         bg="#ABC798",
         fg="#1A1F16",
@@ -807,6 +831,7 @@ def settings_page():
 def menu_page():
     global username_window
     global menu_window
+    global username
 
     # destroying the enter username window
     try:
@@ -901,21 +926,32 @@ def menu_page():
     menu_window.mainloop()
 
 
-# A page where we get the username
-def enter_username_page():
-    global username_window
+# This displays a warning if the username is empty
+def validate_user_input():
     global username
-
-    # This displays a warning if the username is empty
-    def validate_user_input():
-        for character in username.get():
+    global name
+    ok = False
+    name = username.get()
+    if name != "":
+        for character in name:
             if character not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ1234567890":
                 box.showwarning(
                     "Warning",
                     "Usernames can only contain letters and numbers.")
+                ok = True
                 break
-            else:
-                menu_page()
+        if not ok:
+            menu_page()
+    else:
+        box.showwarning(
+                    "Warning",
+                    "Usernames cannot be null")
+
+
+# A page where we get the username
+def enter_username_page():
+    global username_window
+    global username
 
     # Creating the page and configuring it
     username_window = Tk()
@@ -928,10 +964,11 @@ def enter_username_page():
         font="Arial",
         fg="#3A405A",
         pady=20).pack()
-
+    user_var = StringVar()
     # Creating the entry
     username = Entry(username_window, width=30, borderwidth=2, bg="#F9DEC9")
     username.pack()
+
 
     ok_button = Button(
         username_window,
