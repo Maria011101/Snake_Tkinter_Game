@@ -47,10 +47,18 @@ def play_game():
     global resume
     global snakeColour
     global created
+    global obstacle1
+    global obstacle2
+    global upOb
+    global downOb
+    upOb = 1
+    downOb = 2
     created = False
     pause = False
     pause1 = False
     resume = False
+    obstacle1 = None
+    obstacle2 = None
 
     menu_window.destroy()
 
@@ -80,6 +88,7 @@ def play_game():
         food2Y = random.randint(0, height-snakeSize)
         canvas.move(food2, food2X, food2Y)
 
+
     def leftKey(event):
         global direction
         direction = "left"
@@ -101,8 +110,8 @@ def play_game():
         global pause
         global pause1
         global resume
+        global created
         pause1 = False
-        obstacle = None
         canvas.pack()
         positions = []
         positions.append(canvas.coords(snake[0]))
@@ -188,32 +197,14 @@ def play_game():
                 positions[i][2],
                 positions[i][3])
 
+        obstacles(score)
+
         # Resets the pausing and resuming booleans
         # so it will be able to continue
         if resume:
             resume = False
             pause = False
             pause1 = False
-
-        if score > 30:
-            if not created:
-                created = True
-                obstacle1 = canvas.create_rectangle(
-                    250,
-                    0,
-                    270,
-                    100,
-                    fill = "white")
-                obstacle2 = canvas.create_rectangle(
-                    500,
-                    0,
-                    520,
-                    100,
-                    fill = "white")
-            else:
-                canvas.move(obstacle1, 10, 10)
-                canvas.move(obstacle12 10, 10)
-
 
         # Looping through the function if gameOver is False
         if 'gameOver' not in locals():
@@ -340,6 +331,7 @@ def play_game():
         else:
             return False
 
+
     def endScreen():
         global name
         global leaderboard
@@ -403,6 +395,53 @@ def play_game():
             leaders.close()
 
 
+    def obstacles(score):
+        global created
+        global upOb
+        global downOb
+        global obstacle1
+        global obstacle2
+        aux = None
+
+        if score > 30:
+                if not created:
+                    created = True
+                    obstacle1 = canvas.create_rectangle(
+                        150,
+                        0,
+                        170,
+                        100,
+                        fill = "white")
+                    obstacle2 = canvas.create_rectangle(
+                        700,
+                        800,
+                        720,
+                        900,
+                        fill = "white")
+                else:
+                    x1 = canvas.coords(obstacle1)[2]
+                    y1 = canvas.coords(obstacle1)[3]
+                    y2 = canvas.coords(obstacle2)[3]
+                    x2 = canvas.coords(obstacle2)[2]
+
+                    if y1 == 1000 or y2 == 0 or y1 == 0 or y2 == 1000:
+                        aux = upOb
+                        upOb = downOb
+                        downOb = aux
+
+                    if upOb == 1 and downOb == 2:
+                        canvas.move(obstacle1, 0, 10)
+                        y1 += 10
+                        canvas.move(obstacle2, 0, -10)
+                        y2 -= 10
+                    elif upOb == 2 and downOb == 1:
+                        canvas.move(obstacle2, 0, 10)
+                        y2 += 10
+                        canvas.move(obstacle1, 0, -10)
+                        y1 -= 10
+
+
+
     def CheatCode1(event):
         global score
         score += 20
@@ -435,13 +474,13 @@ def play_game():
             pauseText1 = canvas.create_text(
                 (450, 350),
                 text="Game Paused",
-                fill="red",
-                font="Arial 50")
+                fill="#06BEE1",
+                font="Times 50")
 
             pauseText2 = canvas.create_text(
                 (450, 400),
                 text="Press <r> to resume game",
-                fill="red",
+                fill="#06BEE1",
                 font="Arial 20")
 
     width = 1000  # width of snake’s world
