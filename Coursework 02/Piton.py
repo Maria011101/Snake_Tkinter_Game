@@ -15,6 +15,7 @@ global left
 # other globals
 global name
 global bestScore
+global leaderboard
 
 name = None
 snakeHead = "#60992D"
@@ -29,7 +30,8 @@ left = '<Left>'
 # This function runs the game
 def play_game():
     global score
-    global window
+    global leaderboard
+    global name
     global direction
     global menu_window
     global food1
@@ -44,10 +46,11 @@ def play_game():
     global pause1
     global resume
     global snakeColour
+    global created
+    created = False
     pause = False
     pause1 = False
     resume = False
-    obstacle = []
 
     menu_window.destroy()
 
@@ -192,18 +195,25 @@ def play_game():
             pause = False
             pause1 = False
 
-        # if score > 30:
-        #     if len(obstacle) == 0:
-        #         xrand = random.randint(0, 1900)
-        #         obstacle.append(
-        #             canvas.create_rectangle(
-        #                 xrand,
-        #                 0,
-        #                 xrand + 20,
-        #                 100,
-        #                 fill = "white"))
-        #     else:
-        #         canvas.move(obstacle[0], 0, 10)
+        if score > 30:
+            if not created:
+                created = True
+                obstacle1 = canvas.create_rectangle(
+                    250,
+                    0,
+                    270,
+                    100,
+                    fill = "white")
+                obstacle2 = canvas.create_rectangle(
+                    500,
+                    0,
+                    520,
+                    100,
+                    fill = "white")
+            else:
+                canvas.move(obstacle1, 10, 10)
+                canvas.move(obstacle12 10, 10)
+
 
         # Looping through the function if gameOver is False
         if 'gameOver' not in locals():
@@ -331,8 +341,12 @@ def play_game():
             return False
 
     def endScreen():
+        global name
+        global leaderboard
+        # this creates a rectangle on top of the game that will be the end screen
         end_screen = canvas.create_rectangle(0, 0, 1000, 850, fill="#ABC798")
 
+        # the game over text
         game_over = Label(
             window,
             text="GAME OVER!",
@@ -358,6 +372,36 @@ def play_game():
             font=("Arial, 15"),
             command=backToMenu)
         back_to_menu_button.place(x=200, y=400)
+
+        #opening the leaderboard file or
+        # create a new one 
+        try:
+            with open('leaderboard.txt') as leaders:
+                try:
+                    leaderboard = json.load(leaders)
+                    leaders.close()
+                except:
+                    leaderboard = {}
+        except FileNotFoundError:
+            leaders = open("leaderboard.txt", 'x')
+            leaderboard = {}
+            leaders.close()
+
+        # updating the leaderboard file
+        try:
+            if score > leaderboard[name]:
+                    leaderboard[name] = score
+        except KeyError:
+            leaderboard[name] = score
+
+        with open('leaderboard.txt', 'w') as leaders:
+            leaderboard = dict(sorted(
+            leaderboard.items(),
+            key=lambda x: x[1],
+            reverse=True))
+            json.dump(leaderboard, leaders)
+            leaders.close()
+
 
     def CheatCode1(event):
         global score
@@ -467,34 +511,6 @@ def backfleaderboard():
     menu_page()
 
 
-def leaderboard_manage():
-    global name
-    global bestScore
-    global score
-    leaderboard = {}
-    try:
-        with open('leaderboard.txt') as leaders:
-            leaderboard = json.load(leaders)
-            leaders.close()
-    except FileNotFoundError:
-        leaders = open("leaderboard.txt", 'x')
-        leaderboard = {}
-
-    if name not in leaderboard:
-        leaderboard[name] = 0
-    else:
-        bestScore = leaderboard[name]
-
-    with open('leaderboard.txt', 'w') as outfile:
-        json.dump(leaderboard, outfile)
-
-    # if username.get() not in leaders:
-    #     if bestScore < end_score:
-    #         bestScore = endscore
-    # else:
-    #     pass
-
-
 # Leaderboard page
 def leaderboard_page():
     global leaderboard_window
@@ -505,7 +521,35 @@ def leaderboard_page():
     leaderboard_window.geometry("1080x1920")
     leaderboard_window.configure(bg="#ABC798")
 
-    leaderboard_manage()
+    try:
+        with open('leaderboard.txt') as leaders:
+            try:
+                leaderboard = json.load(leaders)
+            except:
+                leaderboard = {}
+    except FileNotFoundError:
+        leaders = open("leaderboard.txt", 'x')
+        leaderboard = {}
+
+    if name not in leaderboard:
+        leaderboard[name] = 0
+
+    leaderboard_canvas = Canvas(leaderboard_window, bg="#ABC798", width=900, height=900)
+    place = 1
+    y = 200
+
+    for x in leaderboard:
+        player = str(place) + ". " + str(x) + " :  " + str(leaderboard[x])
+        leaderboard_canvas.create_text(
+            200, y, fill="#1A1F16", font="Times 20", text=str(player)
+        )
+        y += 50
+        place += 1
+    leaderboard_canvas.pack()
+
+    pythonImage = PhotoImage(file="snake4.png")
+    snake = Label(leaderboard_window, image=pythonImage, bg="#ABC798")
+    snake.place(x=500, y=300)
 
     backButton = Button(
         leaderboard_window,
@@ -514,19 +558,25 @@ def leaderboard_page():
         activebackground="#D68C45",
         height=1,
         width=5,
-        font=("Arial, 15"),
+        font=("Times, 15"),
         command=backfleaderboard)
     backButton.place(x=50, y=10)
 
-    # scroll = Scrollbar(leaderboard_window, bg="#D68C45", orient=VERTICAL)
-    # scroll.pack()
+    Label(
+        leaderboard_window,
+        text="If you are a new player, "
+        "you will appear with a score of 0 but"
+        " you will only be saved\n to the leaderboard after your first game.",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 15")).place(x=100, y=700)
 
     Label(
         leaderboard_window,
         text="Leaderboard",
         bg="#ABC798",
         fg="#1A1F16",
-        font=("Arial, 50")).place(x=300, y=50)
+        font=("Times, 50")).place(x=300, y=50)
 
     leaderboard_window.mainloop()
 
