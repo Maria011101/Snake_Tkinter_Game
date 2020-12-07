@@ -3,6 +3,7 @@ import tkinter.messagebox as box
 import random
 import sys
 import json
+import webbrowser as web
 
 # global variables for customization
 global backgroundColour
@@ -33,7 +34,7 @@ def play_game():
     global leaderboard
     global name
     global direction
-    global menu_window
+    # global menu_window
     global food1
     global food1X
     global food1Y
@@ -220,6 +221,7 @@ def play_game():
         else:
             endScreen()
 
+    # moves the food
     def moveFood():
         global food1, food1X, food1Y, food2, food2X, food2Y
 
@@ -235,6 +237,9 @@ def play_game():
         canvas.move(food2, food2X, food2Y)
 
 
+    # adds a new block at the end of the snake
+    # if grow_2blocks is false and two blocks
+    # if grow_2blocks is true
     def growSnake(grow_2blocks=False):
 
         # we add a block at the end of the snake, depending on the direction
@@ -331,14 +336,14 @@ def play_game():
         txt = "Score:" + str(score)
         canvas.itemconfigure(scoreText, text=txt)
 
-
+    # checks to see if a and be are overlapping
     def overlapping(a, b):
         if a[0] < b[2] and a[2] > b[0] and a[1] < b[3] and a[3] > b[1]:
             return True
         else:
             return False
 
-
+    # creates the endscreen
     def endScreen():
         global name
         global leaderboard
@@ -402,6 +407,8 @@ def play_game():
             leaders.close()
 
 
+    # creates obstacles the first time is called
+    # and moves them every other time
     def obstacles(score, snake):
         global created
         global upOb
@@ -434,7 +441,7 @@ def play_game():
                     y2 = canvas.coords(obstacle2)[3]
                     x2 = canvas.coords(obstacle2)[2]
 
-                    # If the obdtacles reach the edge then they change direction
+                    # If the obstacles reach the edge then they change direction
                     if y1 == 1000 or y2 == 0 or y1 == 0 or y2 == 1000:
                         aux = upOb
                         upOb = downOb
@@ -467,11 +474,17 @@ def play_game():
         return False
 
 
+    # cheat code 1
     def CheatCode1(event):
         global score
         score += 20
         txt = "Score:" + str(score)
         canvas.itemconfigure(scoreText, text=txt)
+
+    # bossKey activation
+    def bossKey(event):
+        pause_game(event)
+        web.open("https://finance.yahoo.com/topic/stock-market-news/")
 
 
     def backToMenu():
@@ -548,6 +561,7 @@ def play_game():
     canvas.bind("c", CheatCode1)
     canvas.bind("p", pause_game)
     canvas.bind("r", resume_game)
+    canvas.bind("b", bossKey)
     canvas.focus_set()
     direction = "right"
 
