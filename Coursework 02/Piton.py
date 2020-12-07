@@ -51,6 +51,7 @@ def play_game():
     global obstacle2
     global upOb
     global downOb
+    global frame
     upOb = 1
     downOb = 2
     created = False
@@ -59,6 +60,7 @@ def play_game():
     resume = False
     obstacle1 = None
     obstacle2 = None
+    frame = 90
 
     menu_window.destroy()
 
@@ -111,6 +113,7 @@ def play_game():
         global pause1
         global resume
         global created
+        global frame
         pause1 = False
         canvas.pack()
         positions = []
@@ -166,11 +169,13 @@ def play_game():
         # Checking to see if the snake collided with food
         foodPos1 = canvas.coords(food1)
         if overlapping(sHeadPos, foodPos1):
+            frame -= 1
             moveFood()
             growSnake()
 
         foodPos2 = canvas.coords(food2)
         if overlapping(sHeadPos, foodPos2):
+            frame -= 1
             grow_2blocks = True
             moveFood()
             growSnake(grow_2blocks)
@@ -197,7 +202,7 @@ def play_game():
                 positions[i][2],
                 positions[i][3])
 
-        obstacles(score)
+        game = obstacles(score, snake)
 
         # Resets the pausing and resuming booleans
         # so it will be able to continue
@@ -207,11 +212,11 @@ def play_game():
             pause1 = False
 
         # Looping through the function if gameOver is False
-        if 'gameOver' not in locals():
+        if 'gameOver' not in locals() and not game:
             if pause:
                 pass
             else:
-                window.after(90, moveSnake)
+                window.after(frame, moveSnake)
         else:
             endScreen()
 
@@ -228,6 +233,7 @@ def play_game():
         food2X = random.randint(0, width-snakeSize)
         food2Y = random.randint(0, height-snakeSize)
         canvas.move(food2, food2X, food2Y)
+
 
     def growSnake(grow_2blocks=False):
 
@@ -325,6 +331,7 @@ def play_game():
         txt = "Score:" + str(score)
         canvas.itemconfigure(scoreText, text=txt)
 
+
     def overlapping(a, b):
         if a[0] < b[2] and a[2] > b[0] and a[1] < b[3] and a[3] > b[1]:
             return True
@@ -395,7 +402,7 @@ def play_game():
             leaders.close()
 
 
-    def obstacles(score):
+    def obstacles(score, snake):
         global created
         global upOb
         global downOb
@@ -403,8 +410,10 @@ def play_game():
         global obstacle2
         aux = None
 
-        if score > 30:
+        if score >= 50:
                 if not created:
+                    # created is a variable that becomes true once
+                    # the first obstacles have been created 
                     created = True
                     obstacle1 = canvas.create_rectangle(
                         150,
@@ -413,22 +422,26 @@ def play_game():
                         100,
                         fill = "white")
                     obstacle2 = canvas.create_rectangle(
-                        700,
                         800,
-                        720,
+                        800,
+                        820,
                         900,
                         fill = "white")
                 else:
+                    # coordinates of the obstacles
                     x1 = canvas.coords(obstacle1)[2]
                     y1 = canvas.coords(obstacle1)[3]
                     y2 = canvas.coords(obstacle2)[3]
                     x2 = canvas.coords(obstacle2)[2]
 
+                    # If the obdtacles reach the edge then they change direction
                     if y1 == 1000 or y2 == 0 or y1 == 0 or y2 == 1000:
                         aux = upOb
                         upOb = downOb
                         downOb = aux
 
+                    # UpOb and downOb determine which obstacle goes which way
+                    # For example if upOb is 1 then obstacle 1 is going up
                     if upOb == 1 and downOb == 2:
                         canvas.move(obstacle1, 0, 10)
                         y1 += 10
@@ -440,6 +453,18 @@ def play_game():
                         canvas.move(obstacle1, 0, -10)
                         y1 -= 10
 
+                    #checking to see if the obstacles overlap with the snake
+                    #returning true if the condition is met
+                    for i in range(1,len(snake)):
+                        if overlapping(canvas.coords(snake[i]), canvas.coords(obstacle1)):
+                            return True
+                        if overlapping(canvas.coords(snake[i]), canvas.coords(obstacle2)):
+                            return True
+                    if overlapping(canvas.coords(snake[0]), canvas.coords(obstacle1)):
+                        return True
+                    if overlapping(canvas.coords(snake[0]), canvas.coords(obstacle2)):
+                        return True
+        return False
 
 
     def CheatCode1(event):
@@ -448,9 +473,11 @@ def play_game():
         txt = "Score:" + str(score)
         canvas.itemconfigure(scoreText, text=txt)
 
+
     def backToMenu():
         window.destroy()
         menu_page()
+
 
     def resume_game(event):
         global pauseText1
@@ -461,6 +488,7 @@ def play_game():
             canvas.delete(pauseText1)
             canvas.delete(pauseText2)
             moveSnake()
+
 
     def pause_game(event):
         global pause
@@ -482,6 +510,7 @@ def play_game():
                 text="Press <r> to resume game",
                 fill="#06BEE1",
                 font="Arial 20")
+
 
     width = 1000  # width of snake’s world
     height = 850  # height of snake’s world
