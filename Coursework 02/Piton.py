@@ -27,14 +27,32 @@ down = '<Down>'
 right = '<Right>'
 left = '<Left>'
 
+def load_game():
+    global name
+    try:
+        with open(name + ".txt") as saved:
+                saved_game = json.load(saved)
+    except FileNotFoundError:
+        box.showwarning("ERROR", "No game saved! Please start a new game!")
+
+    play_game(saved_game["score"], saved_game['snake'], saved_game['positions'])
+
+def save_game(save_data):
+    global name
+    try:
+        with open(name + ".txt", 'w') as saved:
+                json.dump(save_data, saved)
+    except FileNotFoundError:
+        saved = open(name + ".txt", 'x')
+        json.dump(save_data, saved)
 
 # This function runs the game
-def play_game():
+def play_game(saved_score=None, saved_snake=None,
+ saved_positions=None, saved_food1=None, saved_food2=None):
     global score
     global leaderboard
     global name
     global direction
-    # global menu_window
     global food1
     global food1X
     global food1Y
@@ -52,6 +70,7 @@ def play_game():
     global obstacle2
     global upOb
     global downOb
+    global positions
     global frame
     upOb = 1
     downOb = 2
@@ -65,12 +84,15 @@ def play_game():
 
     menu_window.destroy()
 
-    def setWindowDimensions(w, h):
+    def setWindowDimensions():
         window = Tk()  # create window
         window.title("PITON Game")  # title of window
-        window.geometry("1080x1920")
+        window.geometry("1100x1920")
+        window.configure(bg="black")
         return window
 
+
+    # places food randomly on the canvas
     def placeFood():
         global food1
         global food1X
@@ -92,6 +114,7 @@ def play_game():
         canvas.move(food2, food2X, food2Y)
 
 
+    # direction of the snake functions
     def leftKey(event):
         global direction
         direction = "left"
@@ -108,6 +131,7 @@ def play_game():
         global direction
         direction = "down"
 
+
     # Moving the snake
     def moveSnake():
         global pause
@@ -115,10 +139,14 @@ def play_game():
         global resume
         global created
         global frame
+        global positions
         pause1 = False
         canvas.pack()
-        positions = []
-        positions.append(canvas.coords(snake[0]))
+        if saved_positions != None:
+            positions = saved_positions
+        else:
+            positions = []
+            positions.append(canvas.coords(snake[0]))
         # Adding the snake's head coords to the list
 
         # Checking to see if the snake reached the edge and teleporting it
@@ -220,6 +248,7 @@ def play_game():
                 window.after(frame, moveSnake)
         else:
             endScreen()
+
 
     # moves the food
     def moveFood():
@@ -336,6 +365,7 @@ def play_game():
         txt = "Score:" + str(score)
         canvas.itemconfigure(scoreText, text=txt)
 
+
     # checks to see if a and be are overlapping
     def overlapping(a, b):
         if a[0] < b[2] and a[2] > b[0] and a[1] < b[3] and a[3] > b[1]:
@@ -343,13 +373,14 @@ def play_game():
         else:
             return False
 
+
     # creates the endscreen
     def endScreen():
         global name
         global leaderboard
         # this creates a rectangle on top of the game that will be the end screen
         end_screen = canvas.create_rectangle(0, 0, 1000, 850, fill="#ABC798")
-
+        saveButton.destroy()
         # the game over text
         game_over = Label(
             window,
@@ -422,16 +453,18 @@ def play_game():
                     # created is a variable that becomes true once
                     # the first obstacles have been created 
                     created = True
+                    x1rand = random.randint(0,800)
+                    x2rand = random.randint(0,800)
                     obstacle1 = canvas.create_rectangle(
-                        150,
+                        x1rand,
                         0,
-                        170,
+                        x1rand + 20,
                         100,
                         fill = "white")
                     obstacle2 = canvas.create_rectangle(
+                        x2rand,
                         800,
-                        800,
-                        820,
+                        x2rand + 20,
                         900,
                         fill = "white")
                 else:
@@ -481,6 +514,7 @@ def play_game():
         txt = "Score:" + str(score)
         canvas.itemconfigure(scoreText, text=txt)
 
+
     # bossKey activation
     def bossKey(event):
         pause_game(event)
@@ -524,18 +558,49 @@ def play_game():
                 fill="#06BEE1",
                 font="Arial 20")
 
+    def save_dict():
+        global score
+        global snake
+        global positions
+        global food1X
+        global food1Y
+        global food2X
+        global food2Y
 
-    width = 1000  # width of snake’s world
+        game = {}
+        game["score"] = score
+        game["snake"] = snake
+        game["positions"] = positions
+        game["food1"] = canvas.coords(food1)
+        game["food2"] = canvas.coords(food2)
+        save_game(game)
+        backToMenu()
+
+    width = 850  # width of snake’s world
     height = 850  # height of snake’s world
 
     # creating the window
-    window = setWindowDimensions(width, height)
+    window = setWindowDimensions()
     global backgroundColour
     canvas = Canvas(window, bg=backgroundColour, width=width, height=height)
 
+    saveButton = Button(
+        window,
+        text="Save and Exit",
+        bg="#5D737E",
+        activebackground="#D68C45",
+        height=2,
+        width=10,
+        font=("Arial, 15"),
+        command=save_dict)
+    saveButton.place(x=10, y=10)
+
     # creating the snake
-    snake = []
+    global snake
     snakeSize = 20
+    snake = []
+
+    # Creating the snake head
     snake.append(
         canvas.create_rectangle(
             snakeSize,
@@ -544,7 +609,24 @@ def play_game():
             snakeSize * 2,
             fill=snakeHead))
 
-    score = 0  # the score starts at 0
+    # If there is a saved game loaded then we create the snake
+    # so it has the same length
+    if saved_snake != None:
+        for i in range(1, len(saved_snake)):
+            snake.append(
+                canvas.create_rectangle(
+                    0,
+                    0,
+                    snakeSize,
+                    snakeSize,
+                    fill=snakeColour))
+
+    if saved_score != None:
+        score = saved_score
+    else:
+        score = 0  # the score starts at 0 if there
+        # was no previous save
+
     txt = "Score:" + str(score)
     # Creating a text widget to show the score
     scoreText = canvas.create_text(
@@ -553,6 +635,12 @@ def play_game():
         fill="white",
         font="Times 20 italic bold",
         text=txt)
+
+    if up == 'w':
+        canvas.bind('A', leftKey)
+        canvas.bind('D', rightKey)
+        canvas.bind('W', upKey)
+        canvas.bind('S', downKey)
 
     canvas.bind(left, leftKey)
     canvas.bind(right, rightKey)
@@ -564,8 +652,6 @@ def play_game():
     canvas.bind("b", bossKey)
     canvas.focus_set()
     direction = "right"
-
-    # createObstacle(100,10)
 
     placeFood()
     moveSnake()
@@ -682,13 +768,27 @@ def rules_page():
         fg="#1A1F16",
         font=("Arial, 50")).place(x=300, y=50)
 
+    Label(
+        rule_window,
+        text="Default Controls:",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 25")).place(x=100, y=150)
+
+    Label(
+        rule_window,
+        text="'<Up>'-up, '<Right>'-right, '<Down>'-down, '<Left>'-left",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 25")).place(x=100, y=150)
+
     yellowfoodButton = Button(
         rule_window,
         bg="#FEFFA5",
         activebackground="#FEFFA5",
         height=1,
         width=1)
-    yellowfoodButton.place(x=100, y=200)
+    yellowfoodButton.place(x=100, y=250)
 
     Label(
         rule_window,
@@ -696,7 +796,7 @@ def rules_page():
         " \nwhile adding 10 points to the score.",
         bg="#ABC798",
         fg="#1A1F16",
-        font=("Arial, 20")).place(x=150, y=200)
+        font=("Arial, 20")).place(x=150, y=250)
 
     redfoodButton = Button(
         rule_window,
@@ -704,7 +804,7 @@ def rules_page():
         activebackground="#931F1D",
         height=1,
         width=1)
-    redfoodButton.place(x=100, y=300)
+    redfoodButton.place(x=100, y=350)
 
     Label(
         rule_window,
@@ -712,28 +812,51 @@ def rules_page():
         " \nwhile adding 10 points to the score.",
         bg="#ABC798",
         fg="#1A1F16",
-        font=("Arial, 20")).place(x=150, y=300)
+        font=("Arial, 20")).place(x=150, y=350)
+
+    obstacleButton = Button(
+        rule_window,
+        bg="white",
+        activebackground="white",
+        height=6,
+        width=1)
+    obstacleButton.place(x=100, y=450)
+
+    Label(
+        rule_window,
+        text="- These obstacles appear after you reach the score of 50."
+        " If the\n snake touches them either with the head or the tail it dies\n and"
+        " the game ends.",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 20")).place(x=150, y=450)
 
     Label(
         rule_window,
         text="< Cheat Code > - Press 'c' to add 20 points to your score.",
         bg="#ABC798",
         fg="#1A1F16",
-        font=("Arial, 20")).place(x=100, y=400)
+        font=("Arial, 20")).place(x=100, y=600)
 
     Label(
         rule_window,
         text="- Press 'p' to add pause the game.",
         bg="#ABC798",
         fg="#1A1F16",
-        font=("Arial, 20")).place(x=100, y=450)
+        font=("Arial, 20")).place(x=100, y=650)
 
     Label(
         rule_window,
         text="- Press 'r' to resume the game.",
         bg="#ABC798",
         fg="#1A1F16",
-        font=("Arial, 20")).place(x=100, y=500)
+        font=("Arial, 20")).place(x=100, y=700)
+    Label(
+        rule_window,
+        text="- Press 'b' to activate the boss key.",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 20")).place(x=100, y=750)
 
     backButton = Button(
         rule_window,
@@ -983,7 +1106,7 @@ def menu_page():
         bg="#ABC798",
         fg="#1A1F16",
         font=("Helvetica, 50"))
-    menuTitle.place(x=350, y=100)
+    menuTitle.place(x=400, y=50)
 
     menuTitleSmall = Label(
         menu_window,
@@ -991,20 +1114,31 @@ def menu_page():
         bg="#ABC798",
         fg="#1A1F16",
         font=("Helvetica, 35"))
-    menuTitleSmall.place(x=200, y=240)
+    menuTitleSmall.place(x=200, y=140)
     
     # Menu Buttons
 
     playButton = Button(
         menu_window,
-        text="Start",
+        text="New Game",
         bg="#5D737E",
         activebackground="#D68C45",
         height=2,
         width=15,
         font=("Arial, 15"),
         command=play_game)
-    playButton.place(x=200, y=300)
+    playButton.place(x=200, y=200)
+
+    loadButton = Button(
+        menu_window,
+        text="Load A Saved Game",
+        bg="#5D737E",
+        activebackground="#D68C45",
+        height=2,
+        width=15,
+        font=("Arial, 15"),
+        command=load_game)
+    loadButton.place(x=200, y=300)
 
     rulesButton = Button(
         menu_window,
