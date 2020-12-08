@@ -531,6 +531,16 @@ def play_game(saved_score=None, saved_snake=None,
         canvas.itemconfigure(scoreText, text=txt)
 
 
+    def CheatCode2(event):
+        global snake
+        if len(snake) >= 2:
+            canvas.delete(snake[len(snake)-1])
+            snake.remove(snake[len(snake)-1])
+        else:
+            pass
+
+
+
     # bossKey activation
     def bossKey(event):
         pause_game(event)
@@ -663,6 +673,7 @@ def play_game(saved_score=None, saved_snake=None,
     canvas.bind(up, upKey)
     canvas.bind(down, downKey)
     canvas.bind("c", CheatCode1)
+    canvas.bind("m", CheatCode2)
     canvas.bind("p", pause_game)
     canvas.bind("r", resume_game)
     canvas.bind("b", bossKey)
