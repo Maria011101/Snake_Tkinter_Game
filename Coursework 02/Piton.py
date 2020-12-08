@@ -35,7 +35,7 @@ def load_game():
                 saved_game = json.load(saved)
                 saved.close()
                 play_game(saved_game["score"], saved_game['snake'],
-                 saved_game['positions'], saved_game["food1"], saved_game["food2"])
+                 saved_game['positions'], saved_game["food1"], saved_game["food2"], saved_game["direction"])
     except FileNotFoundError:
         box.showwarning("ERROR", "No game saved! Please start a new game!")
 
@@ -52,7 +52,7 @@ def save_game(save_data):
 
 # This function runs the game
 def play_game(saved_score=None, saved_snake=None,
- saved_positions=None, saved_food2=None, saved_food1=None):
+ saved_positions=None, saved_food1=None, saved_food2=None, saved_direction=None):
     global score
     global leaderboard
     global name
@@ -85,14 +85,12 @@ def play_game(saved_score=None, saved_snake=None,
     obstacle1 = None
     obstacle2 = None
     frame = 90
+    food1X = None
+    food1Y = None
+    food2X = None
+    food2Y = None
 
     menu_window.destroy()
-    # If there is a saved game but the player chooses
-    # to start a new one the save will be deleted
-    if saved_snake == None:
-        if os.path.exists(name + ".txt"):
-            os.remove(name + ".txt")
-
 
     def setWindowDimensions():
         window = Tk()  # create window
@@ -116,19 +114,22 @@ def play_game(saved_score=None, saved_snake=None,
         if saved_food1 == None:
             food1X = random.randint(0, width-snakeSize)
             food1Y = random.randint(0, height-snakeSize)
-            canvas.move(food1, food1X, food1Y)
         else:
-            canvas.move(food1, saved_food1[0], saved_food2[1])
+            food1X = saved_food1[0]
+            food1Y = saved_food1[1]
+
+        canvas.move(food1, food1X, food1Y)
 
         food2 = canvas.create_rectangle(
             0, 0, snakeSize, snakeSize, fill="#931F1D")
         if saved_food2 == None:
             food2X = random.randint(0, width-snakeSize)
             food2Y = random.randint(0, height-snakeSize)
-            canvas.move(food2, food2X, food2Y)
         else:
-            canvas.move(food2, saved_food2[0], saved_food2[1])
+            food2X = saved_food2[0]
+            food2Y = saved_food2[1]
 
+        canvas.move(food2, food2X, food2Y)
 
     # direction of the snake functions
     def leftKey(event):
@@ -395,7 +396,7 @@ def play_game(saved_score=None, saved_snake=None,
         global name
         global leaderboard
         # this creates a rectangle on top of the game that will be the end screen
-        end_screen = canvas.create_rectangle(0, 0, 1000, 850, fill="#ABC798")
+        end_screen = canvas.create_rectangle(0, 0, 900, 850, fill="#ABC798")
         saveButton.destroy()
         # the game over text
         game_over = Label(
@@ -424,7 +425,13 @@ def play_game(saved_score=None, saved_snake=None,
             command=backToMenu)
         back_to_menu_button.place(x=200, y=400)
 
-        #opening the leaderboard file or
+        # The game deletes the previous save if there is one
+        # at the end of the game
+        if os.path.exists(name + ".txt"):
+            os.remove(name + ".txt")
+
+
+        # opening the leaderboard file or
         # create a new one 
         try:
             with open('leaderboard.txt') as leaders:
@@ -530,7 +537,7 @@ def play_game(saved_score=None, saved_snake=None,
         txt = "Score:" + str(score)
         canvas.itemconfigure(scoreText, text=txt)
 
-
+    # cheat code 2
     def CheatCode2(event):
         global snake
         if len(snake) >= 2:
@@ -588,14 +595,15 @@ def play_game(saved_score=None, saved_snake=None,
         global score
         global snake
         global positions
-        global food1X
-        global food1Y
-        global food2X
-        global food2Y
+        global food1
+        global food2
+        global direction
+
 
         game = {}
         game["score"] = score
         game["snake"] = snake
+        game["direction"] = direction
         game["positions"] = positions
         game["food1"] = canvas.coords(food1)
         game["food2"] = canvas.coords(food2)
@@ -634,6 +642,8 @@ def play_game(saved_score=None, saved_snake=None,
             snakeSize * 2,
             snakeSize * 2,
             fill=snakeHead))
+    if saved_positions != None:
+        canvas.move(snake[0], saved_positions[0][0], saved_positions[0][1])
 
     # If there is a saved game loaded then we create the snake
     # so it has the same length
@@ -646,6 +656,7 @@ def play_game(saved_score=None, saved_snake=None,
                     snakeSize,
                     snakeSize,
                     fill=snakeColour))
+            canvas.move(snake[i], saved_positions[i][0], saved_positions[i][1])
 
     if saved_score != None:
         score = saved_score
@@ -663,6 +674,7 @@ def play_game(saved_score=None, saved_snake=None,
         text=txt)
 
     if up == 'w':
+        # binding capital keys as well
         canvas.bind('A', leftKey)
         canvas.bind('D', rightKey)
         canvas.bind('W', upKey)
@@ -677,8 +689,17 @@ def play_game(saved_score=None, saved_snake=None,
     canvas.bind("p", pause_game)
     canvas.bind("r", resume_game)
     canvas.bind("b", bossKey)
+    # binding capital keys as well
+    canvas.bind("C", CheatCode1)
+    canvas.bind("M", CheatCode2)
+    canvas.bind("P", pause_game)
+    canvas.bind("R", resume_game)
+    canvas.bind("B", bossKey)
     canvas.focus_set()
-    direction = "right"
+    if saved_direction != None:
+        direction = saved_direction
+    else:
+        direction = "right"
 
     placeFood()
     moveSnake()
@@ -867,23 +888,30 @@ def rules_page():
 
     Label(
         rule_window,
-        text="- Press 'p' to add pause the game.",
+        text="< Cheat Code > - Press 'm' to delete a block off the tail of the snake.",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=100, y=650)
 
     Label(
         rule_window,
-        text="- Press 'r' to resume the game.",
+        text="- Press 'p' to pause the game.",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=100, y=700)
+
+    Label(
+        rule_window,
+        text="- Press 'r' to resume the game.",
+        bg="#ABC798",
+        fg="#1A1F16",
+        font=("Arial, 20")).place(x=100, y=750)
     Label(
         rule_window,
         text="- Press 'b' to activate the boss key.",
         bg="#ABC798",
         fg="#1A1F16",
-        font=("Arial, 20")).place(x=100, y=750)
+        font=("Arial, 20")).place(x=100, y=800)
 
     backButton = Button(
         rule_window,
