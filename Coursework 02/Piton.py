@@ -4,6 +4,7 @@ import random
 import sys
 import json
 import webbrowser as web
+import os
 
 # global variables for customization
 global backgroundColour
@@ -32,10 +33,12 @@ def load_game():
     try:
         with open(name + ".txt") as saved:
                 saved_game = json.load(saved)
+                saved.close()
+                play_game(saved_game["score"], saved_game['snake'],
+                 saved_game['positions'], saved_game["food1"], saved_game["food2"])
     except FileNotFoundError:
         box.showwarning("ERROR", "No game saved! Please start a new game!")
 
-    play_game(saved_game["score"], saved_game['snake'], saved_game['positions'])
 
 def save_game(save_data):
     global name
@@ -45,10 +48,11 @@ def save_game(save_data):
     except FileNotFoundError:
         saved = open(name + ".txt", 'x')
         json.dump(save_data, saved)
+    saved.close()
 
 # This function runs the game
 def play_game(saved_score=None, saved_snake=None,
- saved_positions=None, saved_food1=None, saved_food2=None):
+ saved_positions=None, saved_food2=None, saved_food1=None):
     global score
     global leaderboard
     global name
@@ -83,6 +87,12 @@ def play_game(saved_score=None, saved_snake=None,
     frame = 90
 
     menu_window.destroy()
+    # If there is a saved game but the player chooses
+    # to start a new one the save will be deleted
+    if saved_snake == None:
+        if os.path.exists(name + ".txt"):
+            os.remove(name + ".txt")
+
 
     def setWindowDimensions():
         window = Tk()  # create window
@@ -103,15 +113,21 @@ def play_game(saved_score=None, saved_snake=None,
 
         food1 = canvas.create_rectangle(
         	0, 0, snakeSize, snakeSize, fill="#FEFFA5")
-        food1X = random.randint(0, width-snakeSize)
-        food1Y = random.randint(0, height-snakeSize)
-        canvas.move(food1, food1X, food1Y)
+        if saved_food1 == None:
+            food1X = random.randint(0, width-snakeSize)
+            food1Y = random.randint(0, height-snakeSize)
+            canvas.move(food1, food1X, food1Y)
+        else:
+            canvas.move(food1, saved_food1[0], saved_food2[1])
 
         food2 = canvas.create_rectangle(
             0, 0, snakeSize, snakeSize, fill="#931F1D")
-        food2X = random.randint(0, width-snakeSize)
-        food2Y = random.randint(0, height-snakeSize)
-        canvas.move(food2, food2X, food2Y)
+        if saved_food2 == None:
+            food2X = random.randint(0, width-snakeSize)
+            food2Y = random.randint(0, height-snakeSize)
+            canvas.move(food2, food2X, food2Y)
+        else:
+            canvas.move(food2, saved_food2[0], saved_food2[1])
 
 
     # direction of the snake functions
@@ -780,7 +796,7 @@ def rules_page():
         text="'<Up>'-up, '<Right>'-right, '<Down>'-down, '<Left>'-left",
         bg="#ABC798",
         fg="#1A1F16",
-        font=("Arial, 25")).place(x=100, y=150)
+        font=("Arial, 20")).place(x=100, y=200)
 
     yellowfoodButton = Button(
         rule_window,
