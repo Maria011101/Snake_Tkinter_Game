@@ -1,7 +1,6 @@
 from tkinter import *
 import tkinter.messagebox as box
 import random
-import sys
 import json
 import webbrowser as web
 import os
@@ -20,26 +19,35 @@ global bestScore
 global leaderboard
 
 name = None
-snakeHead = "#60992D"
-snakeColour = "#ABC798"
-backgroundColour = "#1A1F16"
+snakeHead = "#157F1F"
+snakeColour = "#4CB963"
+backgroundColour = "#48233C"
 up = '<Up>'
 down = '<Down>'
 right = '<Right>'
 left = '<Left>'
 
+# Loads a saved game
 def load_game():
     global name
+    # The game creates a text file with a save with each username
+    # So each user can have their on saved game
     try:
         with open(name + ".txt") as saved:
                 saved_game = json.load(saved)
                 saved.close()
-                play_game(saved_game["score"], saved_game['snake'],
-                 saved_game['positions'], saved_game["food1"], saved_game["food2"], saved_game["direction"])
+                play_game(
+                    saved_game["score"],
+                    saved_game['snake'],
+                    saved_game['positions'],
+                    saved_game["food1"],
+                    saved_game["food2"],
+                    saved_game["direction"])
     except FileNotFoundError:
+        # In case there is no load present for the user, this error message appears
         box.showwarning("ERROR", "No game saved! Please start a new game!")
 
-
+# This function creates a new text file for each user that wants to create a save
 def save_game(save_data):
     global name
     try:
@@ -53,7 +61,6 @@ def save_game(save_data):
 # This function runs the game
 def play_game(saved_score=None, saved_snake=None,
  saved_positions=None, saved_food1=None, saved_food2=None, saved_direction=None):
-    global score
     global leaderboard
     global name
     global direction
@@ -63,8 +70,6 @@ def play_game(saved_score=None, saved_snake=None,
     global food2
     global food2X
     global food2Y
-    global width
-    global height
     global pause
     global pause1
     global resume
@@ -76,6 +81,7 @@ def play_game(saved_score=None, saved_snake=None,
     global downOb
     global positions
     global frame
+    # Initialising some of the global variables
     upOb = 1
     downOb = 2
     created = False
@@ -109,6 +115,9 @@ def play_game(saved_score=None, saved_snake=None,
         global food2X
         global food2Y
 
+        # Creates the food rectangle and if the game is not
+        # a loaded save then it randomly generates the first position,
+        # otherwise it loads the previous position
         food1 = canvas.create_rectangle(
         	0, 0, snakeSize, snakeSize, fill="#FEFFA5")
         if saved_food1 == None:
@@ -120,6 +129,9 @@ def play_game(saved_score=None, saved_snake=None,
 
         canvas.move(food1, food1X, food1Y)
 
+        # Creates the food rectangle and if the game is not
+        # a loaded save then it randomly generates the first position,
+        # otherwise it loads the previous position
         food2 = canvas.create_rectangle(
             0, 0, snakeSize, snakeSize, fill="#931F1D")
         if saved_food2 == None:
@@ -159,6 +171,7 @@ def play_game(saved_score=None, saved_snake=None,
         global positions
         pause1 = False
         canvas.pack()
+
         if saved_positions != None:
             positions = saved_positions
         else:
@@ -230,6 +243,7 @@ def play_game(saved_score=None, saved_snake=None,
         for i in range(1, len(snake)):
             if overlapping(sHeadPos, canvas.coords(snake[i])):
                 gameOver = True
+                print("overlapped with itself " + str(i))
                 canvas.create_text(
                     width/2,
                     height/2,
@@ -377,6 +391,7 @@ def play_game(saved_score=None, saved_snake=None,
                     lastElementPos[2],
                     lastElementPos[3]-snakeSize)
 
+        # Updating the score
         global score
         score += 10
         txt = "Score:" + str(score)
@@ -553,12 +568,13 @@ def play_game(saved_score=None, saved_snake=None,
         pause_game(event)
         web.open("https://finance.yahoo.com/topic/stock-market-news/")
 
-
+    # Back to menu function for when the game is finished
+    # (associated with the back to menu button)
     def backToMenu():
         window.destroy()
         menu_page()
 
-
+    # Resume game after pause
     def resume_game(event):
         global pauseText1
         global resume
@@ -569,7 +585,7 @@ def play_game(saved_score=None, saved_snake=None,
             canvas.delete(pauseText2)
             moveSnake()
 
-
+    # Pauses the game
     def pause_game(event):
         global pause
         global pause1
@@ -591,6 +607,8 @@ def play_game(saved_score=None, saved_snake=None,
                 fill="#06BEE1",
                 font="Arial 20")
 
+    # when the save button is pressed this function creates
+    # a dictionary with data needed to be uploaded to the file
     def save_dict():
         global score
         global snake
@@ -598,7 +616,6 @@ def play_game(saved_score=None, saved_snake=None,
         global food1
         global food2
         global direction
-
 
         game = {}
         game["score"] = score
@@ -618,6 +635,7 @@ def play_game(saved_score=None, saved_snake=None,
     global backgroundColour
     canvas = Canvas(window, bg=backgroundColour, width=width, height=height)
 
+    # the Save and exit button
     saveButton = Button(
         window,
         text="Save and Exit",
@@ -642,6 +660,7 @@ def play_game(saved_score=None, saved_snake=None,
             snakeSize * 2,
             snakeSize * 2,
             fill=snakeHead))
+    # If a saved game is loaded, the game moves the snake to its previous position
     if saved_positions != None:
         canvas.move(snake[0], saved_positions[0][0], saved_positions[0][1])
 
@@ -928,10 +947,10 @@ def rules_page():
 
 
 # function to change background colour to green
-def changeToGreen():
+def changeToOrange():
     global backgroundColour
-    backgroundColour = "#1A1F16"
-    box.showinfo("Done!", "Selected dark green!")
+    backgroundColour = "#FCD29F"
+    box.showinfo("Done!", "Selected Orange!")
 
 
 # function to change background colour to blue
@@ -942,16 +961,16 @@ def changeToBlue():
 
 
 # function to change background colour to beige
-def changeToBeige():
+def changeToLightBlue():
     global backgroundColour
-    backgroundColour = "#EFF0D1"
-    box.showinfo("Done!", "Selected beige!")
+    backgroundColour = "#028090"
+    box.showinfo("Done!", "Selected Metallic Seaweed!")
 
 
 # function to change background colour to pink
 def changeToPurple():
     global backgroundColour
-    backgroundColour = "#511730"
+    backgroundColour = "#48233C"
     box.showinfo("Done!", "Selected purple!")
 
 
@@ -959,8 +978,8 @@ def changeToPurple():
 def snakeGreen():
     global snakeHead
     global snakeColour
-    snakeHead = "#60992D"
-    snakeColour = "#ABC798"
+    snakeHead = "#157F1F"
+    snakeColour = "#4CB963"
     box.showinfo("Done!", "Selected green!")
 
 
@@ -1040,10 +1059,10 @@ def settings_page():
 
     colourButton1 = Button(
         settings_window,
-        bg="#1A1F16",
+        bg="#FCD29F",
         height=5,
         width=10,
-        command=changeToGreen)
+        command=changeToOrange)
     colourButton1.place(x=100, y=250)
 
     colourButton2 = Button(
@@ -1056,15 +1075,15 @@ def settings_page():
 
     colourButton3 = Button(
         settings_window,
-        bg="#EFF0D1",
+        bg="#028090",
         height=5,
         width=10,
-        command=changeToBeige)
+        command=changeToLightBlue)
     colourButton3.place(x=500, y=250)
 
     colourButton4 = Button(
         settings_window,
-        bg="#511730",
+        bg="#48233C",
         height=5,
         width=10,
         command=changeToPurple)
@@ -1236,7 +1255,7 @@ def menu_page():
         height=2,
         width=15,
         font=("Arial, 15"),
-        command=sys.exit)
+        command=menu_window.destroy)
     exitButton.place(x=200, y=700)
 
     # Menu picture of snake
