@@ -1,3 +1,5 @@
+# 1920x1080
+# images from http://clipart-library.com/search2/?q=snake#gsc.tab=1&gsc.q=snake&gsc.page=1
 from tkinter import *
 import tkinter.messagebox as box
 import random
@@ -27,6 +29,7 @@ down = '<Down>'
 right = '<Right>'
 left = '<Left>'
 
+
 # Loads a saved game
 def load_game():
     global name
@@ -44,10 +47,13 @@ def load_game():
                     saved_game["food2"],
                     saved_game["direction"])
     except FileNotFoundError:
-        # In case there is no load present for the user, this error message appears
+        # In case there is no load present for the user,
+        # this error message appears
         box.showwarning("ERROR", "No game saved! Please start a new game!")
 
-# This function creates a new text file for each user that wants to create a save
+
+# This function creates a new text file
+# for each user that wants to create a save
 def save_game(save_data):
     global name
     try:
@@ -58,10 +64,17 @@ def save_game(save_data):
         json.dump(save_data, saved)
     saved.close()
 
+
 # This function runs the game
-def play_game(saved_score=None, saved_snake=None,
- saved_positions=None, saved_food1=None, saved_food2=None, saved_direction=None):
+def play_game(saved_score=None,
+              saved_snake=None,
+              saved_positions=None,
+              saved_food1=None,
+              saved_food2=None,
+              saved_direction=None):
+
     global leaderboard
+    global score
     global name
     global direction
     global food1
@@ -101,10 +114,9 @@ def play_game(saved_score=None, saved_snake=None,
     def setWindowDimensions():
         window = Tk()  # create window
         window.title("PITON Game")  # title of window
-        window.geometry("1100x1920")
+        window.geometry("1080x1920")
         window.configure(bg="black")
         return window
-
 
     # places food randomly on the canvas
     def placeFood():
@@ -120,7 +132,7 @@ def play_game(saved_score=None, saved_snake=None,
         # otherwise it loads the previous position
         food1 = canvas.create_rectangle(
         	0, 0, snakeSize, snakeSize, fill="#FEFFA5")
-        if saved_food1 == None:
+        if saved_food1 is None:
             food1X = random.randint(0, width-snakeSize)
             food1Y = random.randint(0, height-snakeSize)
         else:
@@ -134,7 +146,7 @@ def play_game(saved_score=None, saved_snake=None,
         # otherwise it loads the previous position
         food2 = canvas.create_rectangle(
             0, 0, snakeSize, snakeSize, fill="#931F1D")
-        if saved_food2 == None:
+        if saved_food2 is None:
             food2X = random.randint(0, width-snakeSize)
             food2Y = random.randint(0, height-snakeSize)
         else:
@@ -160,7 +172,6 @@ def play_game(saved_score=None, saved_snake=None,
         global direction
         direction = "down"
 
-
     # Moving the snake
     def moveSnake():
         global pause
@@ -169,14 +180,13 @@ def play_game(saved_score=None, saved_snake=None,
         global created
         global frame
         global positions
+        global width
+        global height
         pause1 = False
         canvas.pack()
 
-        if saved_positions != None:
-            positions = saved_positions
-        else:
-            positions = []
-            positions.append(canvas.coords(snake[0]))
+        positions = []
+        positions.append(canvas.coords(snake[0]))
         # Adding the snake's head coords to the list
 
         # Checking to see if the snake reached the edge and teleporting it
@@ -241,9 +251,9 @@ def play_game(saved_score=None, saved_snake=None,
 
         # Checking to see if the snake collided with itself
         for i in range(1, len(snake)):
+            # print(str(sHeadPos) + " with "+ str(canvas.coords(snake[i])))
             if overlapping(sHeadPos, canvas.coords(snake[i])):
                 gameOver = True
-                print("overlapped with itself " + str(i))
                 canvas.create_text(
                     width/2,
                     height/2,
@@ -254,14 +264,15 @@ def play_game(saved_score=None, saved_snake=None,
         # Making each part of the body follow the previous one
         for i in range(1, len(snake)):
             positions.append(canvas.coords(snake[i]))
-        for i in range(len(snake)-1):
+        for i in range(1, len(snake)):
             canvas.coords(
-                snake[i+1],
-                positions[i][0],
-                positions[i][1],
-                positions[i][2],
-                positions[i][3])
+                snake[i],
+                positions[i-1][0],
+                positions[i-1][1],
+                positions[i-1][2],
+                positions[i-1][3])
 
+        # Creating and moving the obstacles everytime the snake moves
         game = obstacles(score, snake)
 
         # Resets the pausing and resuming booleans
@@ -280,7 +291,6 @@ def play_game(saved_score=None, saved_snake=None,
         else:
             endScreen()
 
-
     # moves the food
     def moveFood():
         global food1, food1X, food1Y, food2, food2X, food2Y
@@ -295,7 +305,6 @@ def play_game(saved_score=None, saved_snake=None,
         food2X = random.randint(0, width-snakeSize)
         food2Y = random.randint(0, height-snakeSize)
         canvas.move(food2, food2X, food2Y)
-
 
     # adds a new block at the end of the snake
     # if grow_2blocks is false and two blocks
@@ -397,7 +406,6 @@ def play_game(saved_score=None, saved_snake=None,
         txt = "Score:" + str(score)
         canvas.itemconfigure(scoreText, text=txt)
 
-
     # checks to see if a and be are overlapping
     def overlapping(a, b):
         if a[0] < b[2] and a[2] > b[0] and a[1] < b[3] and a[3] > b[1]:
@@ -405,12 +413,12 @@ def play_game(saved_score=None, saved_snake=None,
         else:
             return False
 
-
     # creates the endscreen
     def endScreen():
         global name
         global leaderboard
-        # this creates a rectangle on top of the game that will be the end screen
+        # this creates a rectangle on top of the game
+        # that will be the end screen
         end_screen = canvas.create_rectangle(0, 0, 900, 850, fill="#ABC798")
         saveButton.destroy()
         # the game over text
@@ -445,9 +453,8 @@ def play_game(saved_score=None, saved_snake=None,
         if os.path.exists(name + ".txt"):
             os.remove(name + ".txt")
 
-
         # opening the leaderboard file or
-        # create a new one 
+        # create a new one
         try:
             with open('leaderboard.txt') as leaders:
                 try:
@@ -469,12 +476,11 @@ def play_game(saved_score=None, saved_snake=None,
 
         with open('leaderboard.txt', 'w') as leaders:
             leaderboard = dict(sorted(
-            leaderboard.items(),
-            key=lambda x: x[1],
-            reverse=True))
+                leaderboard.items(),
+                key=lambda x: x[1],
+                reverse=True))
             json.dump(leaderboard, leaders)
             leaders.close()
-
 
     # creates obstacles the first time is called
     # and moves them every other time
@@ -489,22 +495,22 @@ def play_game(saved_score=None, saved_snake=None,
         if score >= 50:
                 if not created:
                     # created is a variable that becomes true once
-                    # the first obstacles have been created 
+                    # the first obstacles have been created
                     created = True
-                    x1rand = random.randint(0,800)
-                    x2rand = random.randint(0,800)
+                    x1rand = random.randint(0, 800)
+                    x2rand = random.randint(0, 800)
                     obstacle1 = canvas.create_rectangle(
                         x1rand,
                         0,
                         x1rand + 20,
                         100,
-                        fill = "white")
+                        fill="white")
                     obstacle2 = canvas.create_rectangle(
                         x2rand,
                         800,
                         x2rand + 20,
                         900,
-                        fill = "white")
+                        fill="white")
                 else:
                     # coordinates of the obstacles
                     x1 = canvas.coords(obstacle1)[2]
@@ -512,7 +518,8 @@ def play_game(saved_score=None, saved_snake=None,
                     y2 = canvas.coords(obstacle2)[3]
                     x2 = canvas.coords(obstacle2)[2]
 
-                    # If the obstacles reach the edge then they change direction
+                    # If the obstacles reach the edge then
+                    # they change direction
                     if y1 == 1000 or y2 == 0 or y1 == 0 or y2 == 1000:
                         aux = upOb
                         upOb = downOb
@@ -531,19 +538,26 @@ def play_game(saved_score=None, saved_snake=None,
                         canvas.move(obstacle1, 0, -10)
                         y1 -= 10
 
-                    #checking to see if the obstacles overlap with the snake
-                    #returning true if the condition is met
-                    for i in range(1,len(snake)):
-                        if overlapping(canvas.coords(snake[i]), canvas.coords(obstacle1)):
+                    # checking to see if the obstacles overlap with the snake
+                    # returning true if the condition is met
+                    for i in range(1, len(snake)):
+                        if overlapping(
+                                canvas.coords(snake[i]),
+                                canvas.coords(obstacle1)):
                             return True
-                        if overlapping(canvas.coords(snake[i]), canvas.coords(obstacle2)):
+                        if overlapping(
+                                canvas.coords(snake[i]),
+                                canvas.coords(obstacle2)):
                             return True
-                    if overlapping(canvas.coords(snake[0]), canvas.coords(obstacle1)):
+                    if overlapping(
+                            canvas.coords(snake[0]),
+                            canvas.coords(obstacle1)):
                         return True
-                    if overlapping(canvas.coords(snake[0]), canvas.coords(obstacle2)):
+                    if overlapping(
+                            canvas.coords(snake[0]),
+                            canvas.coords(obstacle2)):
                         return True
         return False
-
 
     # cheat code 1
     def CheatCode1(event):
@@ -560,8 +574,6 @@ def play_game(saved_score=None, saved_snake=None,
             snake.remove(snake[len(snake)-1])
         else:
             pass
-
-
 
     # bossKey activation
     def bossKey(event):
@@ -627,6 +639,8 @@ def play_game(saved_score=None, saved_snake=None,
         save_game(game)
         backToMenu()
 
+    global width
+    global height
     width = 850  # width of snake’s world
     height = 850  # height of snake’s world
 
@@ -660,13 +674,14 @@ def play_game(saved_score=None, saved_snake=None,
             snakeSize * 2,
             snakeSize * 2,
             fill=snakeHead))
-    # If a saved game is loaded, the game moves the snake to its previous position
-    if saved_positions != None:
+    # If a saved game is loaded, the game moves the snake
+    # to its previous position
+    if saved_positions is not None:
         canvas.move(snake[0], saved_positions[0][0], saved_positions[0][1])
 
     # If there is a saved game loaded then we create the snake
     # so it has the same length
-    if saved_snake != None:
+    if saved_snake is not None:
         for i in range(1, len(saved_snake)):
             snake.append(
                 canvas.create_rectangle(
@@ -677,7 +692,7 @@ def play_game(saved_score=None, saved_snake=None,
                     fill=snakeColour))
             canvas.move(snake[i], saved_positions[i][0], saved_positions[i][1])
 
-    if saved_score != None:
+    if saved_score is not None:
         score = saved_score
     else:
         score = 0  # the score starts at 0 if there
@@ -715,7 +730,7 @@ def play_game(saved_score=None, saved_snake=None,
     canvas.bind("R", resume_game)
     canvas.bind("B", bossKey)
     canvas.focus_set()
-    if saved_direction != None:
+    if saved_direction is not None:
         direction = saved_direction
     else:
         direction = "right"
@@ -755,7 +770,7 @@ def leaderboard_page():
     leaderboard_window.title("Leaderboard")
     leaderboard_window.geometry("1080x1920")
     leaderboard_window.configure(bg="#ABC798")
-
+    # Using  try... except to catch any errors that may occur
     try:
         with open('leaderboard.txt') as leaders:
             try:
@@ -766,22 +781,27 @@ def leaderboard_page():
         leaders = open("leaderboard.txt", 'x')
         leaderboard = {}
 
+    # If there is a new user they start with a score of 0 on the leaderboard
     if name not in leaderboard:
         leaderboard[name] = 0
 
-    leaderboard_canvas = Canvas(leaderboard_window, bg="#ABC798", width=900, height=900)
+    leaderboard_canvas = Canvas(
+        leaderboard_window,
+        bg="#ABC798",
+        width=900,
+        height=900)
     place = 1
     y = 200
 
+    # Outputting the leaderboard onto the canvas
     for x in leaderboard:
         player = str(place) + ". " + str(x) + " :  " + str(leaderboard[x])
         leaderboard_canvas.create_text(
-            200, y, fill="#1A1F16", font="Times 20", text=str(player)
-        )
+            200, y, fill="#1A1F16", font="Times 20", text=str(player))
         y += 50
         place += 1
     leaderboard_canvas.pack()
-
+    # Snake image
     pythonImage = PhotoImage(file="snake4.png")
     snake = Label(leaderboard_window, image=pythonImage, bg="#ABC798")
     snake.place(x=500, y=300)
@@ -797,6 +817,7 @@ def leaderboard_page():
         command=backfleaderboard)
     backButton.place(x=50, y=10)
 
+    # Explanation label
     Label(
         leaderboard_window,
         text="If you are a new player, "
@@ -827,14 +848,14 @@ def rules_page():
     rule_window.title("Rules")
     rule_window.geometry("1080x1920")
     rule_window.configure(bg="#ABC798")
-
+    # Ttile
     Label(
         rule_window,
         text="Game Rules",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 50")).place(x=300, y=50)
-
+    # Default Controls
     Label(
         rule_window,
         text="Default Controls:",
@@ -848,7 +869,7 @@ def rules_page():
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=100, y=200)
-
+    # Explanation for yellow food
     yellowfoodButton = Button(
         rule_window,
         bg="#FEFFA5",
@@ -864,7 +885,7 @@ def rules_page():
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=150, y=250)
-
+    # Explanation for red food
     redfoodButton = Button(
         rule_window,
         bg="#931F1D",
@@ -881,6 +902,7 @@ def rules_page():
         fg="#1A1F16",
         font=("Arial, 20")).place(x=150, y=350)
 
+    # Obstacle explanation
     obstacleButton = Button(
         rule_window,
         bg="white",
@@ -892,12 +914,14 @@ def rules_page():
     Label(
         rule_window,
         text="- These obstacles appear after you reach the score of 50."
-        " If the\n snake touches them either with the head or the tail it dies\n and"
+        " If the\n snake touches them either with the head or"
+        " the tail it dies\n and"
         " the game ends.",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=150, y=450)
 
+    # Cheat codes
     Label(
         rule_window,
         text="< Cheat Code > - Press 'c' to add 20 points to your score.",
@@ -907,11 +931,13 @@ def rules_page():
 
     Label(
         rule_window,
-        text="< Cheat Code > - Press 'm' to delete a block off the tail of the snake.",
+        text="< Cheat Code > - Press 'm' to delete a block "
+        "off the tail of the snake.",
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=100, y=650)
 
+    # Pause and resume explanation
     Label(
         rule_window,
         text="- Press 'p' to pause the game.",
@@ -925,6 +951,8 @@ def rules_page():
         bg="#ABC798",
         fg="#1A1F16",
         font=("Arial, 20")).place(x=100, y=750)
+
+    # Boss key
     Label(
         rule_window,
         text="- Press 'b' to activate the boss key.",
@@ -1043,6 +1071,7 @@ def settings_page():
         command=backfsettings)
     backButton.place(x=50, y=10)
 
+    # Title
     Label(
         settings_window,
         text="Settings",
@@ -1050,6 +1079,7 @@ def settings_page():
         fg="#1A1F16",
         font=("Arial, 50")).place(x=350, y=50)
 
+    # First type of customization: background colour
     Label(
         settings_window,
         text="Background colour:",
@@ -1089,6 +1119,7 @@ def settings_page():
         command=changeToPurple)
     colourButton4.place(x=700, y=250)
 
+    # Second type of customization: snake colour
     Label(
         settings_window,
         text="Snake colour:",
@@ -1112,6 +1143,7 @@ def settings_page():
         command=snakePink)
     colourButton6.place(x=300, y=450)
 
+    # Third type of customization: Controls
     Label(
         settings_window,
         text="Controls:",
@@ -1189,7 +1221,7 @@ def menu_page():
         fg="#1A1F16",
         font=("Helvetica, 35"))
     menuTitleSmall.place(x=200, y=140)
-    
+
     # Menu Buttons
 
     playButton = Button(
@@ -1272,9 +1304,14 @@ def validate_user_input():
     global name
     ok = False
     name = username.get()
+    # Allowed characters for the username
+    char = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ1234567890"
+
+    # If the name is null or cointains a character that is not a letter
+    # or a number a warning appears
     if name != "":
         for character in name:
-            if character not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ1234567890":
+            if character not in char:
                 box.showwarning(
                     "Warning",
                     "Usernames can only contain letters and numbers.")
@@ -1308,7 +1345,6 @@ def enter_username_page():
     # Creating the entry
     username = Entry(username_window, width=30, borderwidth=2, bg="#F9DEC9")
     username.pack()
-
 
     ok_button = Button(
         username_window,
