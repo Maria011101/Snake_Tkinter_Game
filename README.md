@@ -1,3 +1,3 @@
-# Python Coursework 01
+# Python Coursework 01 - Spell Check Machine
+# Python Coursework 02 - Snake Game
 
-Base repo for Pyton Coursework (COMP16321)
